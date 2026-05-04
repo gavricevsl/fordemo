@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style data-source="imported">
+        :root {
+            --bg-primary: #0B0B14;
+            --bg-secondary: #14141F;
+            --bg-elevated: #1C1C2A;
+            --bg-alt: #13101F;
+            --bg-footer: #08070F;
+            --accent-orange: #FF6B2C;
+            --accent-orange-soft: #FF8A5C;
+            --accent-purple: #6B4FBF;
+            --accent-purple-deep: #2A1F4A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B8B8C8;
+            --text-muted: #7A7A8C;
+            --border: #2A2A3D;
+            --gradient-hero: linear-gradient(135deg, #2A1F4A 0%, #0B0B14 60%, #1A1430 100%);
+            --gradient-accent: linear-gradient(90deg, #FF6B2C 0%, #FF8A5C 100%);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 17px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            line-height: 1.15;
+        }
+
+        h1 {
+            font-size: 56px;
+        }
+
+        h2 {
+            font-size: 36px;
+        }
+
+        h3 {
+            font-size: 22px;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--accent-orange);
+            outline-offset: 3px;
+        }
+
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── SECTION SPACING ── */
+        .ds-section {
+            padding: 112px 0;
+            position: relative;
+        }
+
+        /* ── ALTERNATING SECTION BACKGROUNDS ── */
+        .bg-alt {
+            background-color: var(--bg-alt);
+        }
+
+        /* Card contrast fix inside bg-alt sections */
+        .bg-alt .card,
+        .bg-alt .chart-card {
+            background: #1C172E;
+        }
+
+        .bg-alt .source-row:hover {
+            background: #1C172E;
+        }
+
+        /* Section transitions */
+        main section+section {
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* Subtle fade overlay at section color transitions */
+        .ds-section:not(.bg-alt)+.ds-section.bg-alt::before,
+        .ds-section.bg-alt+.ds-section:not(.bg-alt)::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .ds-section:not(.bg-alt)+.ds-section.bg-alt::before {
+            background: linear-gradient(to bottom, var(--bg-primary), transparent);
+            opacity: 0.35;
+        }
+
+        .ds-section.bg-alt+.ds-section:not(.bg-alt)::before {
+            background: linear-gradient(to bottom, var(--bg-alt), transparent);
+            opacity: 0.35;
+        }
+
+        /* ── FADE-IN ── */
+        .ds-section {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 600ms ease, transform 600ms ease;
+        }
+
+        .ds-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ds-section {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+
+            .ds-section.is-visible {
+                transition: none;
+            }
+        }
+
+        /* ── NAV ── */
+        .site-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background: rgba(11, 11, 20, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            transition: background 300ms ease;
+        }
+
+        .site-nav.is-scrolled {
+            background: rgba(11, 11, 20, 0.96);
+        }
+
+        .nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--text-primary);
+        }
+
+        .nav-logo span {
+            color: var(--accent-orange);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: color 200ms ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a:focus-visible {
+            color: var(--accent-orange);
+        }
+
+        .nav-hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            color: var(--text-primary);
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            width: 100%;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            z-index: 9998;
+            padding: 16px 24px 24px;
+        }
+
+        .mobile-menu.is-open {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            transition: color 200ms ease;
+        }
+
+        .mobile-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--accent-orange);
+        }
+
+        /* ── HERO ── */
+        #hero {
+            position: relative;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            background: var(--gradient-hero);
+            padding-top: 64px;
+            overflow: hidden;
+        }
+
+        #hero .hero-blob {
+            position: absolute;
+            top: -120px;
+            right: -100px;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(107, 79, 191, 0.25) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        #hero .hero-dots {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 80px 0;
+        }
+
+        .hero-eyebrow {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-orange);
+            border: 1px solid rgba(255, 107, 44, 0.4);
+            padding: 6px 16px;
+            border-radius: 999px;
+            margin-bottom: 28px;
+        }
+
+        .hero-h1 {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.08;
+            margin-bottom: 28px;
+            color: var(--text-primary);
+        }
+
+        .hero-lede {
+            font-size: 17px;
+            line-height: 1.75;
+            color: var(--text-secondary);
+            max-width: 720px;
+            margin-bottom: 20px;
+        }
+
+        .hero-subline {
+            font-size: 19px;
+            font-weight: 600;
+            color: var(--accent-orange-soft);
+            max-width: 700px;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .btn-cta {
+            display: inline-block;
+            background: var(--gradient-accent);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 14px 28px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease;
+            box-shadow: 0 4px 20px rgba(255, 107, 44, 0.3);
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 107, 44, 0.4);
+            filter: brightness(1.1);
+            color: #fff;
+        }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 107, 44, 0.3);
+            box-shadow: 0 8px 32px rgba(255, 107, 44, 0.06);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .card {
+                transition: none;
+            }
+
+            .card:hover {
+                transform: none;
+            }
+        }
+
+        /* ── STAGGER ITEMS ── */
+        .stagger-item {
+            opacity: 0;
+            transform: translateY(24px);
+            filter: blur(4px);
+            transition: opacity 600ms ease-out, transform 600ms cubic-bezier(0.22, 1, 0.36, 1), filter 600ms ease-out;
+        }
+
+        .stagger-item.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+
+        /* Hide step-chevrons inside stagger groups until revealed */
+        [data-stagger-group] .step-chevron {
+            opacity: 0;
+            filter: blur(4px);
+            transition: opacity 600ms ease-out, filter 600ms ease-out;
+        }
+
+        [data-stagger-group].stagger-revealed .step-chevron {
+            opacity: 1;
+            filter: blur(0);
+            transition-delay: 200ms;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .stagger-item {
+                opacity: 1;
+                transform: none;
+                filter: none;
+                transition: none;
+            }
+
+            [data-stagger-group] .step-chevron {
+                opacity: 1;
+                filter: none;
+                transition: none;
+            }
+        }
+
+        /* Prevent stagger-item from overriding card hover transform */
+        .stagger-item.card:hover {
+            transform: translateY(-4px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .stagger-item.card:hover {
+                transform: none;
+            }
+        }
+
+        /* ── SECTION EYEBROW & TITLE ── */
+        .section-eyebrow {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent-orange);
+            margin-bottom: 12px;
+        }
+
+        .accent-bar {
+            width: 48px;
+            height: 4px;
+            border-radius: 4px;
+            background: var(--gradient-accent);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .section-intro {
+            font-size: 17px;
+            line-height: 1.75;
+            color: var(--text-secondary);
+            max-width: 720px;
+        }
+
+        .section-closing {
+            font-size: 17px;
+            line-height: 1.75;
+            color: var(--text-secondary);
+            max-width: 720px;
+            margin-top: 48px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── GRID ── */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .grid-2-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        /* ── SECTION 1 — Executive Summary ── */
+        .exec-card {
+            background: var(--bg-elevated);
+            border-left: 4px solid var(--accent-orange);
+            border-radius: 16px;
+            padding: 40px 36px;
+        }
+
+        .exec-card p {
+            font-size: 17px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        /* ── SECTION 2 — Stats ── */
+        .stat-card {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 64px;
+            font-weight: 800;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ── SECTION 3 — Pillar Cards ── */
+        .pillar-card .pillar-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+            color: var(--accent-orange);
+        }
+
+        .pillar-card .pillar-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .pillar-card .pillar-desc {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* ── SECTION 4 — Generic Response ── */
+        .deco-block {
+            background: linear-gradient(135deg, var(--accent-purple-deep) 0%, var(--accent-purple) 100%);
+            border-radius: 16px;
+            min-height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 40px;
+        }
+
+        .deco-block svg {
+            opacity: 0.7;
+        }
+
+        .prose p {
+            font-size: 17px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .prose p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ── SECTION 5 — Pricing ── */
+        .pricing-card {
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            transition: transform 200ms ease, border-color 200ms ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 107, 44, 0.3);
+        }
+
+        .pricing-card.has-glow {
+            border: none;
+            position: relative;
+        }
+
+        .pricing-card.has-glow::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            padding: 1px;
+            background: var(--gradient-accent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .pricing-header {
+            padding: 28px 28px 20px;
+            text-align: center;
+        }
+
+        .pricing-header.pre {
+            background: rgba(42, 31, 74, 0.6);
+        }
+
+        .pricing-header.post {
+            background: rgba(255, 107, 44, 0.08);
+        }
+
+        .pricing-tag {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        .pricing-header h3 {
+            font-size: 18px;
+            margin: 4px 0 8px;
+            color: var(--text-primary);
+        }
+
+        .price-big {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .price-range {
+            font-size: 14px;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 2px;
+        }
+
+        .pricing-body {
+            padding: 24px 28px 28px;
+        }
+
+        .pricing-body ul {
+            list-style: none;
+        }
+
+        .pricing-body li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .pricing-body li:last-child {
+            border-bottom: none;
+        }
+
+        .li-icon {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .li-icon.warn {
+            color: var(--accent-orange);
+        }
+
+        .li-icon.good {
+            color: #4ADE80;
+        }
+
+        /* ── SECTION 6 — Chart ── */
+        .chart-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 700px;
+            margin: 0 auto 48px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .steps-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .step-item {
+            text-align: center;
+            flex: 1;
+            max-width: 220px;
+        }
+
+        .step-num {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--gradient-accent);
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .step-title-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .step-desc-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .step-chevron {
+            color: var(--text-muted);
+            flex-shrink: 0;
+            padding: 0 8px;
+            margin-top: -40px;
+        }
+
+        /* ── SECTION 7 — Callout ── */
+        .callout-card {
+            background: var(--bg-elevated);
+            border-left: 4px solid var(--accent-orange);
+            border-radius: 16px;
+            padding: 36px 40px;
+        }
+
+        .callout-card p {
+            font-size: 17px;
+            line-height: 1.75;
+            color: var(--text-primary);
+        }
+
+        .callout-card .callout-italic {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        /* ── SECTION 8 — Strategy Cards ── */
+        .strategy-card {
+            border-top: none;
+        }
+
+        .strategy-num {
+            font-size: 48px;
+            font-weight: 800;
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--accent-orange);
+            line-height: 1;
+            margin-bottom: 16px;
+        }
+
+        .strategy-card h3 {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .strategy-card p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* ── SECTION 9 — Takeaway Cards ── */
+        .takeaway-card .takeaway-num {
+            font-size: 40px;
+            font-weight: 800;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 16px;
+        }
+
+        .takeaway-card .takeaway-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .takeaway-card .takeaway-desc {
+            font-size: 15px;
+            line-height: 1.65;
+            color: var(--text-secondary);
+        }
+
+        .conclusion-closing {
+            font-size: 19px;
+            font-style: italic;
+            color: var(--text-secondary);
+            line-height: 1.75;
+            max-width: 780px;
+            text-align: center;
+            margin: 48px auto 0;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── SECTION 10 — Sources ── */
+        .source-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 12px;
+            border-radius: 8px;
+            transition: background 200ms ease, transform 200ms ease;
+            cursor: default;
+        }
+
+        .source-row:hover {
+            background: var(--bg-elevated);
+            transform: translateX(4px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .source-row:hover {
+                transform: none;
+            }
+        }
+
+        .source-ord {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-orange);
+            flex-shrink: 0;
+            width: 28px;
+            text-align: right;
+        }
+
+        .source-text {
+            font-size: 15px;
+            line-height: 1.65;
+        }
+
+        .source-text strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .source-text span {
+            color: var(--text-muted);
+        }
+
+        /* ── FOOTER ── */
+        .site-footer {
+            border-top: 1px solid var(--border);
+            padding: 48px 0;
+            text-align: center;
+            background-color: var(--bg-footer);
+        }
+
+        .footer-block {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .footer-avatar-wrap {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+        }
+
+        .footer-avatar-img {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            object-fit: cover;
+            display: block;
+        }
+
+        .footer-avatar-fallback {
+            display: none;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--accent-purple-deep);
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .footer-avatar-fallback.is-active {
+            display: flex;
+        }
+
+        .footer-text-group {
+            text-align: left;
+        }
+
+        .footer-byline {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .footer-copyright {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .footer-block {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .footer-text-group {
+                text-align: center;
+            }
+
+            .footer-avatar-wrap {
+                width: 56px;
+                height: 56px;
+            }
+
+            .footer-avatar-img {
+                width: 56px;
+                height: 56px;
+            }
+
+            .footer-avatar-fallback {
+                width: 56px;
+                height: 56px;
+                font-size: 18px;
+            }
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1024px) {
+            .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            h1,
+            .hero-h1 {
+                font-size: 44px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ds-section {
+                padding: 64px 0;
+            }
+
+            h1,
+            .hero-h1 {
+                font-size: 36px;
+            }
+
+            h2,
+            .section-title {
+                font-size: 28px;
+            }
+
+            .stat-number {
+                font-size: 48px;
+            }
+
+            .grid-3,
+            .grid-2,
+            .grid-2-content {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 24px;
+            }
+
+            .exec-card {
+                padding: 28px 24px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-hamburger {
+                display: block;
+            }
+
+            .steps-row {
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .step-chevron {
+                display: none;
+            }
+
+            .hero-content {
+                padding: 48px 0;
+            }
+
+            #hero {
+                min-height: auto;
+                padding-top: 80px;
+                padding-bottom: 40px;
+            }
+
+            .strategy-num {
+                font-size: 36px;
+            }
+
+            .callout-card {
+                padding: 28px 24px;
+            }
+        }
+
+
+        @media (prefers-reduced-motion: reduce) {
+            #hero video {
+                display: none !important;
+            }
+
+            #hero {
+                background-color: var(--bg-primary) !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #hero {
+                min-height: 70vh !important;
+            }
+        }
+
+        /* Scroll progress bar */
+        .scroll-progress {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 107, 44, 0.12);
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        .scroll-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--gradient-accent);
+            box-shadow: 0 0 12px rgba(255, 107, 44, 0.5);
+            transition: width 80ms linear;
+            transform-origin: left center;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-progress-bar {
+                transition: width 0ms linear;
+            }
+        }
+
+
+        @media (max-width: 768px) {
+            #generic-response .img-section4 {
+                aspect-ratio: 4/3 !important;
+            }
+
+            #generic-response .img-section4 img {
+                aspect-ratio: 4/3 !important;
+            }
+        }
+
+
+        @media (max-width: 768px) {
+            #pricing-collapse [style*="grid-template-columns:1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .scroll-progress {
+            position: fixed;
+            top: 64px;
+            left: 0px;
+            right: 0px;
+            height: 3px;
+            background-image: initial;
+            background-position-x: initial;
+            background-position-y: initial;
+            background-size: initial;
+            background-repeat: initial;
+            background-attachment: initial;
+            background-origin: initial;
+            background-clip: initial;
+            background-color: rgba(255, 107, 44, 0.12);
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        .scroll-progress-bar {
+            height: 100%;
+            width: 0%;
+            box-shadow: rgba(255, 107, 44, 0.5) 0px 0px 12px;
+            transition-behavior: normal;
+            transition-duration: 80ms;
+            transition-timing-function: linear;
+            transition-delay: 0s;
+            transition-property: width;
+            transform-origin: left center;
+        }
+
+        #ios64 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        #ibl4v {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(180deg, rgba(11, 11, 20, 0.45) 0%, rgba(11, 11, 20, 0.75) 60%, rgba(11, 11, 20, 0.95) 100%);
+            pointer-events: none;
+        }
+
+        #irjlw {
+            position: relative;
+            z-index: 2;
+        }
+
+        #hero {
+            opacity: 1;
+            transform: none;
+            position: relative;
+            overflow: hidden;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-primary);
+            padding-top: 64px;
+        }
+
+        #iufcg {
+            margin-top: 32px;
+        }
+
+        #iqdlsj {
+            margin-bottom: 48px;
+        }
+
+        #i926ml {
+            margin-bottom: 48px;
+        }
+
+        #izhjxk {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            aspect-ratio: 1/1;
+        }
+
+        #i4hwcg {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            aspect-ratio: 1/1;
+        }
+
+        #imisog {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        #ihj7vt {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #izedkh {
+            margin-top: 48px;
+        }
+
+        #iymwpl {
+            margin-bottom: 48px;
+        }
+
+        #i8odyk {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        #iimrey {
+            margin-bottom: 48px;
+        }
+
+        #chartCardContainer {
+            opacity: 1;
+            transform: none;
+        }
+
+        #idre3h {
+            margin-bottom: 32px;
+        }
+
+        #i1475x {
+            margin-top: 48px;
+        }
+
+        #ifdzas {
+            margin: 0 auto 20px;
+        }
+
+        #i2nr7n {
+            text-align: center;
+        }
+
+        #i3h16f {
+            max-width: none;
+        }
+
+        #i683lt {
+            text-align: center;
+            max-width: 740px;
+            margin: 0 auto 48px;
+        }
+
+        #idb0mo {
+            margin-top: 32px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #hero video {
+                display: none !important;
+            }
+
+            #hero {
+                background-color: var(--bg-primary) !important;
+            }
+
+            .scroll-progress-bar {
+                transition-behavior: normal;
+                transition-duration: 0ms;
+                transition-timing-function: linear;
+                transition-delay: 0s;
+                transition-property: width;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #hero {
+                min-height: 70vh !important;
+            }
+
+            #generic-response .img-section4 {
+                aspect-ratio: 4 / 3 !important;
+            }
+
+            #generic-response .img-section4 img {
+                aspect-ratio: 4 / 3 !important;
+            }
+
+            #pricing-collapse [style*="grid-template-columns:1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* ── FLOATING BACK TO TOP BUTTON ── */
+        .back-to-top {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gradient-accent);
+            color: #FFFFFF;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(255, 107, 44, 0.35);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: opacity 250ms ease-out, transform 250ms ease-out, visibility 250ms;
+            font-family: 'Inter', sans-serif;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .back-to-top.is-visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(255, 107, 44, 0.5);
+        }
+
+        .back-to-top:focus-visible {
+            outline: 2px solid #FFFFFF;
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 44px;
+                height: 44px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .back-to-top {
+                transition: none;
+            }
+
+            .back-to-top.is-visible {
+                transition: none;
+            }
+
+            .back-to-top:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+        <header>
+            <nav aria-label="Main navigation" role="navigation" class="site-nav">
+                <div class="nav-inner" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px">
+                    <ul class="nav-links" style="justify-self: center">
+                        <li><a href="#executive-summary">Summary</a></li>
+                        <li><a href="#why-this-matters">Why</a></li>
+                        <li><a href="#what-changed">Changes</a></li>
+                        <li><a href="#pricing-collapse">Pricing</a></li>
+                        <li><a href="#market-expansion">Market</a></li>
+                        <li><a href="#risks-regulatory">Risks</a></li>
+                        <li><a href="#strategic-implications">Implications</a></li>
+                        <li><a href="#conclusion">Conclusion</a></li>
+                    </ul><button type="button" aria-label="Open menu" class="nav-hamburger" style="justify-self: end">Send</button>
+                </div>
+            </nav>
+            <div id="mobileMenu" role="navigation" aria-label="Mobile navigation" class="mobile-menu"><a href="#executive-summary">Summary</a><a href="#why-this-matters">Global Impact</a><a href="#what-changed">What Changed</a><a href="#generic-response">Generic Response</a><a href="#pricing-collapse">Pricing</a><a href="#market-expansion">Expansion</a><a href="#risks-regulatory">Risks</a><a href="#strategic-implications">Strategy</a><a href="#conclusion">Conclusion</a><a href="#sources">Sources</a></div>
+        </header>
+        <main><!-- ═══ HERO ═══ -->
+            <section id="hero"><!-- Force-center nav menu CSS -->
+                <style>
+                    @media (min-width: 769px) {
+                        .site-nav {
+                            position: fixed !important;
+                        }
+
+                        .site-nav .nav-inner {
+                            position: relative !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: flex-start !important;
+                            grid-template-columns: none !important;
+                        }
+
+                        .site-nav .nav-inner .nav-links,
+                        .site-nav .nav-inner>ul,
+                        header nav>div>ul,
+                        nav .nav-links,
+                        nav ul.nav-links {
+                            position: absolute !important;
+                            left: 50% !important;
+                            top: 50% !important;
+                            transform: translate(-50%, -50%) !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            display: flex !important;
+                            gap: 28px !important;
+                            list-style: none !important;
+                            justify-self: unset !important;
+                        }
+
+                        .site-nav .nav-inner .nav-hamburger {
+                            position: absolute !important;
+                            right: 24px !important;
+                            top: 50% !important;
+                            transform: translateY(-50%) !important;
+                        }
+                    }
+                </style><!-- Hero video controls suppression CSS -->
+                <style>
+                    #ios64 {
+                        pointer-events: none !important;
+                    }
+
+                    #ios64::-webkit-media-controls,
+                    #ios64::-webkit-media-controls-panel,
+                    #ios64::-webkit-media-controls-play-button,
+                    #ios64::-webkit-media-controls-start-playback-button,
+                    #ios64::-webkit-media-controls-enclosure {
+                        display: none !important;
+                        -webkit-appearance: none !important;
+                    }
+
+                    video::-webkit-media-controls,
+                    video::-webkit-media-controls-panel,
+                    video::-webkit-media-controls-play-button,
+                    video::-webkit-media-controls-start-playback-button,
+                    video::-webkit-media-controls-enclosure {
+                        display: none !important;
+                        -webkit-appearance: none !important;
+                    }
+                </style><!-- Hero background video --><video autoplay muted loop playsinline preload="auto" aria-hidden="true" disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback noplaybackrate" id="ios64">
+                    <source src="https://cdn.relayto.com/media/files/18458403hd1920108024fps_69f4896627cb430ab9ebf73e.mp4" type="video/mp4" />
+                </video>
+                <script>
+                    (function() {
+                        var v = document.getElementById('ios64');
+                        if (v) {
+                            v.removeAttribute('controls');
+                            v.addEventListener('contextmenu', function(e) {
+                                e.preventDefault();
+                            });
+                        }
+                    })()
+                </script><!-- Video overlay for text readability -->
+                <div id="ibl4v"></div>
+                <div class="wrap">
+                    <div class="hero-content" id="irjlw"><span class="hero-eyebrow">INDIA — MARKET ANALYSIS</span>
+                        <h1 class="hero-h1">Semaglutide Loss of Exclusivity in India: A Market Reset in GLP-1 Therapies</h1>
+                        <p class="hero-lede">In early March 2026, India lost exclusivity on semaglutide, the active ingredient of the most important blockbuster drug in the global GLP-1 market, represented by Novo Nordisk's drugs Ozempic and Wegovy. This event has unleashed an unprecedented wave of generic competition that has fundamentally changed the global pharmaceutical landscape, with prices for semaglutide falling by 80–90% (from ₹15,000 to ₹3,000) representing reductions of up to 90% in 60 days.</p>
+                        <p class="hero-subline">This is not just exciting news. It is the rapid transformation of a premium global therapy into a mass market.</p><a href="#executive-summary" class="btn-cta">Read the analysis</a>
+                    </div>
+                </div><!-- Scroll Progress Indicator -->
+                <div aria-hidden="true" class="scroll-progress">
+                    <div class="scroll-progress-bar"></div>
+                </div>
+            </section><!-- ═══ SECTION 1 — Executive Summary ═══ -->
+            <section id="executive-summary" class="ds-section">
+                <div class="wrap"><span class="section-eyebrow">Section 1</span>
+                    <div class="accent-bar"></div>
+                    <h2 class="section-title">Executive Summary</h2>
+                    <div class="exec-card" id="iufcg">
+                        <p>India's March 2026 court decision pulls a strong global threat. Spotted ingredient of Ozempic and Cipla returns of the most important suppliers in the system that have made 60 generic versions in their own range, including pharmaceuticals exposed to inevitable cost shock. The new generics are priced at ₹3,000–₹5,000, or around 80 to 90 percent below brand variants. India suddenly became the comparison in the approach to GLP-1. Patients have welcomed the affordable approach but the country's second-largest sales rep for obesity availability for 2030 in absolute terms. The result is a new convergence of plant industry: investments thwarted by missiles and seek growth around to project that other industry that is overcoming the most powerful pricing pressure for what is practically a no-go for a not negotiable market force, like a stable.</p>
+                    </div>
+                </div>
+            </section><!-- ═══ SECTION 2 — Why This Matters Globally ═══ -->
+            <section id="why-this-matters" class="ds-section bg-alt">
+                <div class="wrap"><span class="section-eyebrow">Section 2</span>
+                    <div class="accent-bar"></div>
+                    <h2 class="section-title">Why This Matters Globally</h2>
+                    <p class="section-intro" id="iqdlsj">Semaglutide is the active ingredient in the fastest-growing drug class in pharma. India's exclusivity loss is not just a price drop in a single market — it diversifies the most important drug development pipeline globally and accelerates global access.</p>
+                    <div class="grid-3">
+                        <div class="card stat-card">
+                            <div data-target="150" data-prefix="$" data-suffix="B" class="stat-number">$0B</div>
+                            <div class="stat-label">Global Obesity Market</div>
+                            <p class="stat-desc">Projected market value of GLP-1 therapies.</p>
+                        </div>
+                        <div class="card stat-card">
+                            <div data-target="89.8" data-suffix="M" data-decimals="1" class="stat-number">0M</div>
+                            <div class="stat-label">Adults with Diabetes</div>
+                            <p class="stat-desc">In India in 2024 (IDF Diabetes Atlas).</p>
+                        </div>
+                        <div class="card stat-card">
+                            <div data-target="156.7" data-suffix="M" data-decimals="1" class="stat-number">0M</div>
+                            <div class="stat-label">Projected by 2050</div>
+                            <p class="stat-desc">Adults with diabetes, India by 2050.</p>
+                        </div>
+                    </div>
+                </div>
+            </section><!-- ═══ SECTION 3 — What Changed ═══ -->
+            <section id="what-changed" class="ds-section">
+                <div class="wrap"><span class="section-eyebrow">Section 3</span>
+                    <div class="accent-bar"></div>
+                    <h2 class="section-title">What Changed in March 2026</h2>
+                    <p class="section-intro" id="i926ml">In early March 2026 India lost its broad protection on semaglutide, removing the country's main patents holding Ozempic.</p>
+                    <div class="grid-3"><!-- Pillar 1 -->
+                        <div class="card pillar-card">
+                            <div class="pillar-icon"><svg width="32" height="32" fill="none" viewBox="0 0 32 32">
+                                    <rect x="3" y="12" width="10" height="17" rx="2" stroke="currentColor" stroke-width="2"></rect>
+                                    <rect x="19" y="6" width="10" height="23" rx="2" stroke="currentColor" stroke-width="2"></rect>
+                                    <rect x="11" y="3" width="10" height="26" rx="2" stroke="currentColor" stroke-width="2"></rect>
+                                </svg></div>
+                            <div class="pillar-title">40+ Companies</div>
+                            <p class="pillar-desc">More than 40 pharma companies launched generic semaglutide formulations within weeks.</p>
+                        </div><!-- Pillar 2 -->
+                        <div class="card pillar-card">
+                            <div class="pillar-icon"><svg width="32" height="32" fill="none" viewBox="0 0 32 32">
+                                    <rect x="10" y="2" width="12" height="28" rx="6" stroke="currentColor" stroke-width="2"></rect>
+                                    <line x1="10" y1="14" x2="22" y2="14" stroke="currentColor" stroke-width="2"></line>
+                                    <circle cx="16" cy="8" r="2" fill="currentColor"></circle>
+                                </svg></div>
+                            <div class="pillar-title">50+ Generic Brands</div>
+                            <p class="pillar-desc">Over 50 generic brand variants were registered, ranging from ₹3,000–₹5,000.</p>
+                        </div><!-- Pillar 3 -->
+                        <div class="card pillar-card">
+                            <div class="pillar-icon"><svg width="32" height="32" fill="none" viewBox="0 0 32 32">
+                                    <path d="M16 3L19 13H29L21 19L24 29L16 23L8 29L11 19L3 13H13L16 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+                                </svg></div>
+                            <div class="pillar-title">Rapid Rollout</div>
+                            <p class="pillar-desc">Nationwide pharmacy distribution achieved within the first 60 days post-LOE.</p>
+                        </div>
+                    </div>
+                    <p class="section-closing">India's regulatory environment and manufacturing capacity enabled the fastest GLP-1 generic rollout ever recorded in a major market.</p>
+                </div>
+            </section><!-- ═══ SECTION 4 — Generic Response ═══ -->
+            <section id="generic-response" class="ds-section bg-alt">
+                <div class="wrap"><span class="section-eyebrow">Section 4</span>
+                    <div class="accent-bar"></div>
+                    <h2 class="section-title">India's Generic Response at Scale</h2>
+                    <div class="grid-2-content" id="izedkh">
+                        <div id="ihj7vt">
+                            <div class="img-section4" id="i4hwcg"><img src="https://image.pollinations.ai/prompt/editorial%20photo%20scattered%20white%20orange%20pills%20capsules%20on%20dark%20purple%20gradient%20surface%20faint%20india%20map%20silhouette%20background%20cinematic%20no%20text%20no%20logo?width=800&amp;height=800&amp;nologo=true" alt="Pharmaceutical pills scattered with a faint outline of India in the background." loading="lazy" decoding="async" id="izhjxk" /></div>
+                            <p id="imisog">Indian manufacturers scaled generic semaglutide production within weeks of LOE.</p>
+                        </div>
+                        <div class="prose">
+                            <p>The exclusivity loss had an immediate knock-on effect across India's pharma sector. Major manufacturers including Sun Pharma, Dr Reddy's, Lupin, and Aurobindo Strategic Health each took on the challenge to expand manufacturing operations to meet projected demand for hospitals and clinics.</p>
+                            <p>Dr Reddy's became a brand: distribution of more than 60 million injectable pens within first quarter alone, sufficient supply for tens of thousands of patients.</p>
+                            <p>In a remarkable demonstration of organizational power, Indian pharmaceutical firms have shifted from research-and-development partners to global cost leaders, supplying not just India but increasingly export markets across Asia and Africa.</p>
+                        </div>
+                    </div>
+                </div>
+            </section><!-- ═══ SECTION 5 — Pricing Collapse ═══ -->
+            <section id="pricing-collapse" class="ds-section">
+                <div class="wrap"><span class="section-eyebrow">Section 5</span>
+                    <div class="accent-bar"></div>
+                    <h2 class="section-title">Pricing Collapse and Access Expansion</h2>
+                    <p class="section-intro" id="iymwpl">Before delay, the price ranks for the patient drug looked like this.</p>
+                    <div id="i8odyk"><!-- Card A — Pre-Expiry -->
+                        <div class="pricing-card">
+                            <div class="pricing-header pre"><span class="pricing-tag">Pre-Expiry</span>
+                                <h3>Standard Pricing</h3>
+                                <div class="price-big">₹15,000</div><span class="price-range">per pen</span>
+                            </div>
+                            <div class="pricing-body">
+                                <ul>
+                                    <li><span class="li-icon warn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                                <path d="M12 9v4m0 4h.01M10.29 3.86l-8.6 14.88A2 2 0 003.4 21h17.2a2 2 0 001.71-2.26l-8.6-14.88a2 2 0 00-3.42 0z"></path>
+                                            </svg></span><span>Monthly cost ~₹60,000</span></li>
+                                    <li><span class="li-icon warn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                                <path d="M12 9v4m0 4h.01M10.29 3.86l-8.6 14.88A2 2 0 003.4 21h17.2a2 2 0 001.71-2.26l-8.6-14.88a2 2 0 00-3.42 0z"></path>
+                                            </svg></span><span>Coverage limited insurance only</span></li>
+                                    <li><span class="li-icon warn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                                <path d="M12 9v4m0 4h.01M10.29 3.86l-8.6 14.88A2 2 0 003.4 21h17.2a2 2 0 001.71-2.26l-8.6-14.88a2 2 0 00-3.42 0z"></path>
+                                            </svg></span><span>Access urban specialist clinics</span></li>
+                                </ul>
+                            </div>
+                        </div><!-- Card B — Post-Expiry -->
+                        <div class="pricing-card has-glow">
+                            <div class="pricing-header post"><span class="pricing-tag">Post-Expiry</span>
+                                <h3>Generic Pricing</h3>
+                                <div class="price-big">₹3,000 – ₹5,000</div><span class="price-range">per pen</span>
+                            </div>
+                            <div class="pricing-body">
+                                <ul>
+                                    <li><span class="li-icon good"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg></span><span>Monthly cost ~₹15,000 to ₹20,000</span></li>
+                                    <li><span class="li-icon good"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg></span><span>Insurance and government tendering improving</span></li>
+                                    <li><span class="li-icon good"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg></span><span>Pharmacy availability nationwide</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="section-closing">The decline in price from ₹15,000 to ₹3,000 has driven a fundamental shift in who can access semaglutide therapy in India and across emerging markets.</p>
+                </div>
+            </section><!-- ═══ SECTION 6 — Market Expansion ═══ -->
+            <section id="market-expansion" class="ds-section bg-alt">
+                <style>
+                    @keyframes step-circle-pulse {
+                        0% {
+                            transform: scale(1);
+                            box-shadow: 0 0 0 0 rgba(255, 107, 44, 0.55), 0 0 0 0 rgba(255, 107, 44, 0.0);
+                        }
+
+                        50% {
+                            transform: scale(1.06);
+                            box-shadow: 0 0 0 12px rgba(255, 107, 44, 0.0), 0 0 24px 4px rgba(255, 107, 44, 0.35);
+                        }
+
+                        100% {
+                            transform: scale(1);
+                            box-shadow: 0 0 0 0 rgba(255, 107, 44, 0.0), 0 0 0 0 rgba(255, 107, 44, 0.0);
+                        }
+                    }
+
+                    #market-expansion .step-num {
+                        animation: step-circle-pulse 2.6s ease-in-out infinite;
+                        will-change: transform, box-shadow;
+                    }
+
+                    #market-expansion .step-item:nth-child(1) .step-num {
+                        animation-delay: 0s;
+                    }
+
+                    #market-expansion .step-item:nth-child(2) .step-num {
+                        animation-delay: 0.4s;
+                    }
+
+                    #market-expansion .step-item:nth-child(3) .step-num {
+                        animation-delay: 0.8s;
+                    }
+
+                    #market-expansion .step-item:hover .step-num {
+                        animation-play-state: paused;
+                        transform: scale(1.1);
+                        transition: transform 200ms ease-out;
+                    }
+
+                    @media (prefers-reduced-motion: reduce) {
+                        #market-expansion .step-num {
+                            animation: none !important;
+                        }
+                    }
+                </style>
+                <div class="wrap"><span class="section-eyebrow">Section 6</span>
+                    <div class="accent-bar"></div>
+                    <h2 class="section-title">Market Expansion Effect</h2>
+                    <p class="section-intro" id="iimrey">Lower prices translate directly to expanded market reach. Recent quarterly sales reports indicate that the volume of semaglutide units shipped in India in the 60 days following March 2026 increased substantially.</p>
+                    <div data-stagger-group="">
+                        <div id="chartCardContainer" class="chart-card">
+                            <div class="chart-title">Volume of semaglutide units shipped (60-day window)</div><canvas id="marketChart" aria-label="Bar chart comparing semaglutide units shipped: 0.8M last year vs 5.2M in 2026 post-LOE" role="img" height="220"></canvas>
+                        </div>
+                        <div class="steps-row">
+                            <div class="step-item stagger-item">
+                                <div class="step-num">1</div>
+                                <div class="step-title-text">Lower Prices</div>
+                                <p class="step-desc-text">Lower prices increase affordability across income brackets.</p>
+                            </div>
+                            <div class="step-chevron"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 6 15 12 9 18"></polyline>
+                                </svg></div>
+                            <div class="step-item stagger-item">
+                                <div class="step-num">2</div>
+                                <div class="step-title-text">Affordability</div>
+                                <p class="step-desc-text">Affordability drives broader adoption.</p>
+                            </div>
+                            <div class="step-chevron"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="9 6 15 12 9 18"></polyline>
+                                </svg></div>
+                            <div class="step-item stagger-item">
+                                <div class="step-num">3</div>
+                                <div class="step-title-text">Adoption</div>
+                                <p class="step-desc-text">Adoption expands the total addressable market.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="section-closing">In summary, when the price of the drug drops, the supply expands and clearly opens markets, the result of this expansion will be felt globally.</p>
+                </div>
+            </section><!-- ═══ SECTION 7 — Risks ═══ -->
+            <section id="risks-regulatory" class="ds-section">
+                <div class="wrap"><span class="section-eyebrow">Section 7</span>
+                    <div class="accent-bar"></div>
+                    <h2 class="section-title">Risks and Regulatory Pressure</h2>
+                    <p class="section-intro" id="idre3h">Rapid generic rollout brings non-trivial risks.</p>
+                    <div class="callout-card">
+                        <p class="callout-italic">Regulators, especially those swiftly increasing in volume in India in 2026, have reported that under-suspect manufacturers may not adequately attend to long-running and short-running stability of semaglutide injectables.</p>
+                    </div>
+                    <p class="section-closing">This suggests that quality concerns, in turn, may attract additional regulatory attention.</p>
+                </div>
+            </section><!-- ═══ SECTION 8 — Strategic Implications ═══ -->
+            <section id="strategic-implications" class="ds-section bg-alt">
+                <div class="wrap"><span class="section-eyebrow">Section 8</span>
+                    <div class="accent-bar"></div>
+                    <h2 class="section-title">Strategic Implications</h2>
+                    <div data-stagger-group="" class="grid-3" id="i1475x">
+                        <div class="card strategy-card stagger-item">
+                            <div class="strategy-num">01</div>
+                            <h3>For Novo Nordisk</h3>
+                            <p>India represents the front line of broader patent expiration challenges. Maintaining premium pricing globally requires demonstrating ongoing innovation, next-generation formulations, and stronger value evidence to justify the price gap.</p>
+                        </div>
+                        <div class="card strategy-card stagger-item">
+                            <div class="strategy-num">02</div>
+                            <h3>For Indian Manufacturers</h3>
+                            <p>This is both a domestic and global growth opportunity. Quality and regulatory standards must rise to meet international expectations. Indian firms have a chance to become leading exporters of GLP-1 therapies.</p>
+                        </div>
+                        <div class="card strategy-card stagger-item">
+                            <div class="strategy-num">03</div>
+                            <h3>For Global Healthcare Systems</h3>
+                            <p>India's playbook is now a reference point — generic substitution at scale can dramatically reduce the cost of chronic-disease therapy without compromising patient outcomes.</p>
+                        </div>
+                    </div>
+                </div>
+            </section><!-- ═══ SECTION 9 — Conclusion ═══ -->
+            <section id="conclusion" class="ds-section">
+                <div class="wrap">
+                    <div id="i683lt"><span class="section-eyebrow">Section 9</span>
+                        <div class="accent-bar" id="ifdzas"></div>
+                        <h2 class="section-title" id="i2nr7n">Conclusion</h2>
+                        <p class="section-intro" id="i3h16f">India's GLP-1 generic explosion has dramatically reset the market — for India and beyond. In just 60 days, what was a premium therapy became a mass-access medication.</p>
+                    </div>
+                    <div data-stagger-group="" class="grid-3">
+                        <div class="card takeaway-card stagger-item">
+                            <div class="takeaway-num">01</div>
+                            <div class="takeaway-title">Multi-Country Generic Response</div>
+                            <p class="takeaway-desc">India's blueprint will be replicated across other emerging markets within 12–24 months.</p>
+                        </div>
+                        <div class="card takeaway-card stagger-item">
+                            <div class="takeaway-num">02</div>
+                            <div class="takeaway-title">Drug Cost Reduction</div>
+                            <p class="takeaway-desc">Patient cost reductions of 80–90% are now demonstrably feasible at scale.</p>
+                        </div>
+                        <div class="card takeaway-card stagger-item">
+                            <div class="takeaway-num">03</div>
+                            <div class="takeaway-title">Access Expansion</div>
+                            <p class="takeaway-desc">Therapeutic access for diabetes and obesity care expands by an order of magnitude.</p>
+                        </div>
+                    </div>
+                    <p class="conclusion-closing">India's GLP-1 transformation marks the beginning of a new era for global pharmaceutical economics. The question is no longer whether generic competition will reshape the GLP-1 market, but how quickly other countries adopt this model — and how Western pharma will respond.</p>
+                </div>
+            </section><!-- ═══ SECTION 10 — Sources ═══ -->
+            <section id="sources" class="ds-section bg-alt">
+                <div class="wrap"><span class="section-eyebrow">Section 10</span>
+                    <div class="accent-bar"></div>
+                    <h2 class="section-title">Sources</h2>
+                    <div data-stagger-group="" data-stagger-delay="100" id="idb0mo">
+                        <div class="source-row stagger-item"><span class="source-ord">1</span>
+                            <div class="source-text"><strong>Reuters</strong> — <span>India's Cipla launches semaglutide generic at around 80% discount (March 2026).</span></div>
+                        </div>
+                        <div class="source-row stagger-item"><span class="source-ord">2</span>
+                            <div class="source-text"><strong>Economic Times</strong> — <span>Sun Pharma, Dr Reddy's, Lupin, and Aurobindo enter the GLP-1 generic market (March 2026).</span></div>
+                        </div>
+                        <div class="source-row stagger-item"><span class="source-ord">3</span>
+                            <div class="source-text"><strong>IDF Diabetes Atlas</strong> — <span>India diabetes prevalence 89.8M adults (2024), projected 156.7M by 2050.</span></div>
+                        </div>
+                        <div class="source-row stagger-item"><span class="source-ord">4</span>
+                            <div class="source-text"><strong>WHO</strong> — <span>Statement on access to obesity and diabetes therapies in low- and middle-income countries.</span></div>
+                        </div>
+                        <div class="source-row stagger-item"><span class="source-ord">5</span>
+                            <div class="source-text"><strong>Novo Nordisk Investor Briefing</strong> — <span>Q1 2026 commentary on Indian patent expiry.</span></div>
+                        </div>
+                        <div class="source-row stagger-item"><span class="source-ord">6</span>
+                            <div class="source-text"><strong>Indian Pharma Alliance</strong> — <span>Generic semaglutide manufacturer registry, March 2026.</span></div>
+                        </div>
+                        <div class="source-row stagger-item"><span class="source-ord">7</span>
+                            <div class="source-text"><strong>CDSCO</strong> — <span>Approvals for semaglutide generic formulations, India.</span></div>
+                        </div>
+                        <div class="source-row stagger-item"><span class="source-ord">8</span>
+                            <div class="source-text"><strong>Bloomberg</strong> — <span>India's generic playbook now eyeing GLP-1 export markets across Asia and Africa.</span></div>
+                        </div>
+                        <div class="source-row stagger-item"><span class="source-ord">9</span>
+                            <div class="source-text"><strong>Reuters</strong> — <span>Indian regulators flag stability concerns in early generic batches (April 2026).</span></div>
+                        </div>
+                        <div class="source-row stagger-item"><span class="source-ord">10</span>
+                            <div class="source-text"><strong>The Lancet Regional Health</strong> — <span>Affordability and uptake of GLP-1 receptor agonists in India: early evidence.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main><!-- ═══ FOOTER ═══ -->
+        <footer role="contentinfo" class="site-footer">
+            <div class="wrap">
+                <div class="footer-block">
+                    <div class="footer-avatar-wrap"><img src="https://media.licdn.com/dms/image/v2/D4E03AQEUoPIwqtNlDg/profile-displayphoto-scale_400_400/B4EZtfjYRcGcAk-/0/1766834670138?e=1779321600&amp;v=beta&amp;t=74lZqtwnkh5gggFbR26GhIbm3rJVKkHkJKOjdR7uM2g" alt="Founder portrait." loading="lazy" decoding="async" class="footer-avatar-img" />
+                        <div aria-hidden="true" class="footer-avatar-fallback">CD</div>
+                    </div>
+                    <div class="footer-text-group">
+                        <p class="footer-byline">Founder Closing Delta Ltd &amp; GM RELAYTO AI</p>
+                        <p class="footer-copyright">Closing Delta Ltd. 2026, All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </footer><!-- ═══ FLOATING BACK TO TOP BUTTON ═══ --><button class="back-to-top" aria-label="Back to top" title="Back to top">&#8593;</button>
+    </body>
+    <script>
+        (function() {
+            var v = document.querySelector('#hero video');
+            if (v) {
+                v.addEventListener('error', function(e) {
+                    console.error('Hero video error:', v.error);
+                });
+                var s = v.querySelector('source');
+                if (s) {
+                    s.addEventListener('error', function(e) {
+                        console.error('Hero video source error:', e);
+                    });
+                }
+            }
+
+            // Scroll progress bar logic
+            var bar = document.querySelector('.scroll-progress-bar');
+            if (!bar) return;
+            var pending = false;
+
+            function updateProgress() {
+                var scrollTop = window.scrollY || window.pageYOffset;
+                var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                var progress = docHeight > 0 ? scrollTop / docHeight : 0;
+                progress = Math.min(Math.max(progress, 0), 1);
+                bar.style.width = (progress * 100) + '%';
+                pending = false;
+            }
+
+            function onScroll() {
+                if (!pending) {
+                    pending = true;
+                    requestAnimationFrame(updateProgress);
+                }
+            }
+
+            window.addEventListener('scroll', onScroll, {
+                passive: true
+            });
+            window.addEventListener('resize', onScroll, {
+                passive: true
+            });
+            // Initial call
+            updateProgress();
+        })();
+    </script>
+    <script>
+        (function() {
+            'use strict';
+            var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var chartRendered = false;
+
+            function renderChart() {
+                if (chartRendered) return;
+                chartRendered = true;
+                var chartCanvas = document.getElementById('marketChart');
+                if (!chartCanvas) return;
+                var ctx = chartCanvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Last Year', '2026 Post-LOE'],
+                        datasets: [{
+                            label: 'Units Shipped (Millions)',
+                            data: [0.8, 5.2],
+                            backgroundColor: ['#FF6B2C', '#FF8A5C'],
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            barPercentage: 0.5,
+                            categoryPercentage: 0.6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        animation: {
+                            duration: prefersReducedMotion ? 0 : 1500,
+                            easing: 'easeOutQuart'
+                        },
+                        animations: {
+                            y: {
+                                from: function(ctx) {
+                                    return ctx.chart.scales.y ? ctx.chart.scales.y.getPixelForValue(0) : 0;
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#1C1C2A',
+                                titleColor: '#FFFFFF',
+                                bodyColor: '#B8B8C8',
+                                borderColor: '#2A2A3D',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 12,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.parsed.y + 'M units';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#7A7A8C',
+                                    font: {
+                                        family: 'Inter',
+                                        size: 13,
+                                        weight: '500'
+                                    }
+                                },
+                                border: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#7A7A8C',
+                                    font: {
+                                        family: 'Inter',
+                                        size: 12
+                                    },
+                                    callback: function(v) {
+                                        return v + 'M';
+                                    }
+                                },
+                                border: {
+                                    display: false
+                                },
+                                beginAtZero: true,
+                                max: 6
+                            }
+                        }
+                    }
+                });
+            }
+
+            /* Dedicated observer for the chart container */
+            var chartContainer = document.getElementById('chartCardContainer');
+            if (!chartContainer) return;
+
+            if (prefersReducedMotion) {
+                renderChart();
+                return;
+            }
+
+            var chartObs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        renderChart();
+
+                        /* Also trigger stagger items in the same group */
+                        var group = entry.target.closest('[data-stagger-group]');
+                        if (group && !group.classList.contains('stagger-revealed')) {
+                            var items = group.querySelectorAll('.stagger-item');
+                            var delay = parseInt(group.dataset.staggerDelay) || 150;
+                            items.forEach(function(item, index) {
+                                setTimeout(function() {
+                                    item.classList.add('is-visible');
+                                }, index * delay);
+                            });
+                            group.classList.add('stagger-revealed');
+                        }
+
+                        chartObs.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.3,
+                rootMargin: '0px 0px -10% 0px'
+            });
+
+            chartObs.observe(chartContainer);
+        })();
+    </script>
+    <script>
+        (function() {
+            'use strict';
+
+            /* ── Reduced motion check ── */
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            /* ── Mobile menu ── */
+            window.closeMobile = function() {
+                document.getElementById('mobileMenu').classList.remove('is-open');
+            };
+
+            /* ── Smooth scroll for all anchors ── */
+            document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+                a.addEventListener('click', function(e) {
+                    var target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        e.preventDefault();
+                        var offset = 72;
+                        var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                        window.scrollTo({
+                            top: top,
+                            behavior: prefersReducedMotion ? 'auto' : 'smooth'
+                        });
+                    }
+                });
+            });
+
+            /* ── Sticky nav opacity ── */
+            var nav = document.querySelector('.site-nav');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 80) {
+                    nav.classList.add('is-scrolled');
+                } else {
+                    nav.classList.remove('is-scrolled');
+                }
+            }, {
+                passive: true
+            });
+
+            /* ── IntersectionObserver: fade-in sections ── */
+            if (!prefersReducedMotion) {
+                var sections = document.querySelectorAll('.ds-section');
+                var sectionObs = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            sectionObs.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.2
+                });
+                sections.forEach(function(s) {
+                    sectionObs.observe(s);
+                });
+            } else {
+                document.querySelectorAll('.ds-section').forEach(function(s) {
+                    s.classList.add('is-visible');
+                });
+            }
+
+            /* ── Count-up animation ── */
+            function animateCountUp(el) {
+                var target = parseFloat(el.dataset.target);
+                var prefix = el.dataset.prefix || '';
+                var suffix = el.dataset.suffix || '';
+                var decimals = parseInt(el.dataset.decimals) || 0;
+                var duration = 1500;
+                var start = 0;
+                var startTime = null;
+
+                function easeOutQuart(t) {
+                    return 1 - Math.pow(1 - t, 4);
+                }
+
+                function step(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    var progress = Math.min((timestamp - startTime) / duration, 1);
+                    var easedProgress = easeOutQuart(progress);
+                    var current = start + (target - start) * easedProgress;
+                    el.textContent = prefix + current.toFixed(decimals) + suffix;
+                    if (progress < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        el.textContent = prefix + target.toFixed(decimals) + suffix;
+                    }
+                }
+
+                if (prefersReducedMotion) {
+                    el.textContent = prefix + target.toFixed(decimals) + suffix;
+                } else {
+                    requestAnimationFrame(step);
+                }
+            }
+
+            var statEls = document.querySelectorAll('.stat-number[data-target]');
+            var statObs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        animateCountUp(entry.target);
+                        statObs.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.3
+            });
+            statEls.forEach(function(el) {
+                statObs.observe(el);
+            });
+
+            /* ── Chart.js bar chart ── */
+            var chartCanvas = document.getElementById('marketChart');
+            var chartRendered = false;
+
+            function renderChart() {
+                if (chartRendered) return;
+                chartRendered = true;
+
+                var ctx = chartCanvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Last Year', '2026 Post-LOE'],
+                        datasets: [{
+                            label: 'Units Shipped (Millions)',
+                            data: [0.8, 5.2],
+                            backgroundColor: ['#FF6B2C', '#FF8A5C'],
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            barPercentage: 0.5,
+                            categoryPercentage: 0.6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        animation: {
+                            duration: prefersReducedMotion ? 0 : 1200,
+                            easing: 'easeOutQuart'
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#1C1C2A',
+                                titleColor: '#FFFFFF',
+                                bodyColor: '#B8B8C8',
+                                borderColor: '#2A2A3D',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 12,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.parsed.y + 'M units';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#7A7A8C',
+                                    font: {
+                                        family: 'Inter',
+                                        size: 13,
+                                        weight: '500'
+                                    }
+                                },
+                                border: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#7A7A8C',
+                                    font: {
+                                        family: 'Inter',
+                                        size: 12
+                                    },
+                                    callback: function(v) {
+                                        return v + 'M';
+                                    }
+                                },
+                                border: {
+                                    display: false
+                                },
+                                beginAtZero: true,
+                                max: 6
+                            }
+                        }
+                    }
+                });
+            }
+
+            /* ── Stagger reveal observer ── */
+            if (!prefersReducedMotion) {
+                var staggerGroups = document.querySelectorAll('[data-stagger-group]');
+                var staggerObs = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            var group = entry.target;
+                            var items = group.querySelectorAll('.stagger-item');
+                            var delay = parseInt(group.dataset.staggerDelay) || 150;
+
+                            items.forEach(function(item, index) {
+                                setTimeout(function() {
+                                    item.classList.add('is-visible');
+                                }, index * delay);
+                            });
+
+                            /* Reveal step-chevrons alongside the steps */
+                            group.classList.add('stagger-revealed');
+
+                            /* Trigger chart animation if this group contains the chart */
+                            if (group.querySelector('#marketChart')) {
+                                renderChart();
+                            }
+
+                            staggerObs.unobserve(group);
+                        }
+                    });
+                }, {
+                    threshold: 0.2,
+                    rootMargin: '0px 0px -10% 0px'
+                });
+
+                staggerGroups.forEach(function(g) {
+                    staggerObs.observe(g);
+                });
+            } else {
+                /* Reduced motion — show everything immediately */
+                document.querySelectorAll('.stagger-item').forEach(function(item) {
+                    item.classList.add('is-visible');
+                });
+                document.querySelectorAll('[data-stagger-group]').forEach(function(g) {
+                    g.classList.add('stagger-revealed');
+                });
+                renderChart();
+            }
+
+        })();
+    </script>
+    <script>
+        (function() {
+            'use strict';
+            var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var backToTop = document.querySelector('.back-to-top');
+            if (!backToTop) return;
+
+            var toggleBackToTop = function() {
+                if (window.scrollY > 400) {
+                    backToTop.classList.add('is-visible');
+                } else {
+                    backToTop.classList.remove('is-visible');
+                }
+            };
+
+            window.addEventListener('scroll', toggleBackToTop, {
+                passive: true
+            });
+            toggleBackToTop();
+
+            backToTop.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: prefersReducedMotion ? 'auto' : 'smooth'
+                });
+            });
+        })();
+    </script>
+</body>
+
+</html>
