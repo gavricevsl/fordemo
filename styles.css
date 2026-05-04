@@ -80,7 +80,8 @@ h1, h2, h3, h4 {
   margin: 0 0 0.9rem;
   font-weight: 500;
 }
-.eyebrow--center { text-align: center; }
+.eyebrow--center { text-align: center; text-indent: 0.32em; }
+.hero .eyebrow { text-align: center; text-indent: 0.32em; }
 
 .lede {
   font-family: 'Cormorant Garamond', Georgia, serif;
