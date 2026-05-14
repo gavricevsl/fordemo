@@ -1,26 +1,2530 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <title>Closing Delta</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Content that Connects" />
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { height: 100%; overflow: hidden; }
-      iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        display: block;
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RELAYTO AI for Life Sciences — The Content Intelligence Platform</title>
+<meta name="description" content="RELAYTO AI powers every content experience for life sciences — securely, compliantly, at scale. Pharma, biotech, consultancies." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter','system-ui','sans-serif'],
+          mono: ['"JetBrains Mono"','ui-monospace','monospace'],
+        },
+        colors: {
+          deep:      '#020203',
+          base:      '#050506',
+          elevated:  '#0a0a0c',
+          fg:        '#EDEDEF',
+          muted:     '#8A8F98',
+          accent:    '#5E6AD2',
+          accentBr:  '#6872D9',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  :root { color-scheme: dark; }
+  html, body { background:#050506; color:#EDEDEF; }
+  body { font-family:'Inter', system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  ::selection { background:rgba(94,106,210,0.35); color:#fff; }
+
+  /* ====== Background system ====== */
+  .bg-shell {
+    position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;
+    background:
+      radial-gradient(ellipse at top, #0a0a0f 0%, #050506 50%, #020203 100%);
+  }
+  .bg-noise {
+    position:absolute; inset:-50%;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity:0.015; mix-blend-mode:overlay;
+  }
+  .bg-grid {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:0.35;
+    mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8) 30%, transparent 75%);
+  }
+  .blob {
+    position:absolute; border-radius:9999px;
+    filter:blur(120px);
+    will-change:transform;
+    pointer-events:none;
+  }
+  .blob-1 {
+    top:-200px; left:50%; transform:translateX(-50%);
+    width:1100px; height:900px;
+    background:radial-gradient(circle, rgba(94,106,210,0.32), rgba(94,106,210,0) 60%);
+    filter:blur(150px);
+    animation: float1 9s ease-in-out infinite;
+  }
+  .blob-2 {
+    top:30%; left:-200px;
+    width:700px; height:700px;
+    background:radial-gradient(circle, rgba(190,120,220,0.20), rgba(140,80,200,0) 65%);
+    animation: float2 11s ease-in-out infinite;
+  }
+  .blob-3 {
+    top:55%; right:-150px;
+    width:600px; height:700px;
+    background:radial-gradient(circle, rgba(80,140,220,0.18), rgba(60,90,200,0) 65%);
+    filter:blur(110px);
+    animation: float3 13s ease-in-out infinite;
+  }
+  .blob-4 {
+    bottom:-200px; left:30%;
+    width:900px; height:600px;
+    background:radial-gradient(circle, rgba(94,106,210,0.16), rgba(94,106,210,0) 70%);
+    animation: pulse 7s ease-in-out infinite;
+  }
+  @keyframes float1 {
+    0%,100% { transform:translate(-50%,0) rotate(0); }
+    50%     { transform:translate(-50%,-30px) rotate(1deg); }
+  }
+  @keyframes float2 {
+    0%,100% { transform:translate(0,0) rotate(0); }
+    50%     { transform:translate(40px,-25px) rotate(-1.5deg); }
+  }
+  @keyframes float3 {
+    0%,100% { transform:translate(0,0) rotate(0); }
+    50%     { transform:translate(-30px,30px) rotate(2deg); }
+  }
+  @keyframes pulse {
+    0%,100% { opacity:.6; transform:scale(1); }
+    50%     { opacity:.9; transform:scale(1.06); }
+  }
+
+  /* ====== Typography helpers ====== */
+  .grad-text {
+    background:linear-gradient(to bottom, #ffffff 0%, rgba(255,255,255,0.95) 55%, rgba(255,255,255,0.65) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .grad-accent {
+    background:linear-gradient(90deg,#5E6AD2,#9aa3ee,#5E6AD2);
+    background-size:200% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation: shimmer 6s linear infinite;
+  }
+  @keyframes shimmer {
+    0%   { background-position:0% 50%; }
+    100% { background-position:200% 50%; }
+  }
+  .eyebrow {
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+    color:#8A8F98;
+  }
+
+  /* ====== Card / surface system ====== */
+  .surface {
+    position:relative; isolation:isolate;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04)),
+      #0d0d12;
+    border:1px solid rgba(255,255,255,0.09);
+    border-radius:18px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.03),
+      0 2px 20px rgba(0,0,0,0.4),
+      0 0 40px rgba(0,0,0,0.2),
+      inset 0 1px 0 0 rgba(255,255,255,0.06);
+    transition: transform .3s cubic-bezier(.16,1,.3,1), border-color .3s, box-shadow .3s;
+  }
+  .surface::before {
+    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:
+      radial-gradient(300px circle at var(--mx,50%) var(--my,0%), rgba(94,106,210,0.18), transparent 70%);
+    opacity:0; transition:opacity .3s;
+  }
+  .surface:hover::before { opacity:1; }
+  .surface:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.12);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.10),
+      0 10px 40px rgba(0,0,0,0.55),
+      0 0 80px rgba(94,106,210,0.10),
+      inset 0 1px 0 0 rgba(255,255,255,0.08);
+  }
+  .surface > * { position:relative; z-index:1; }
+  .surface-top-line {
+    position:absolute; top:0; left:10%; right:10%; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    pointer-events:none;
+  }
+
+  /* ====== Chip ====== */
+  .chip {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 14px; border-radius:999px;
+    background:rgba(20,20,28,0.85);
+    border:1px solid rgba(255,255,255,0.12);
+    color:#cfd1d6; font-size:13px; letter-spacing:-0.005em;
+    transition:.25s cubic-bezier(.16,1,.3,1);
+    backdrop-filter:blur(6px);
+  }
+  .chip:hover {
+    background:rgba(94,106,210,0.10);
+    border-color:rgba(94,106,210,0.35);
+    color:#fff;
+    transform:translateY(-1px);
+  }
+  .chip-dot {
+    width:5px; height:5px; border-radius:999px;
+    background:#5E6AD2;
+    box-shadow:0 0 8px #5E6AD2;
+  }
+
+  /* ====== Buttons ====== */
+  .btn-primary {
+    position:relative; isolation:isolate; overflow:hidden;
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 22px; border-radius:10px;
+    background:linear-gradient(180deg, #6872D9, #5260C0);
+    color:#fff; font-weight:500; font-size:15px;
+    box-shadow:
+      0 0 0 1px rgba(94,106,210,0.55),
+      0 8px 24px rgba(94,106,210,0.35),
+      0 2px 8px rgba(0,0,0,0.4),
+      inset 0 1px 0 0 rgba(255,255,255,0.25);
+    transition: transform .15s ease-out, box-shadow .25s, background .25s;
+  }
+  .btn-primary::after {
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(120deg, transparent 35%, rgba(255,255,255,0.25) 50%, transparent 65%);
+    transform:translateX(-120%);
+    transition:transform .65s cubic-bezier(.16,1,.3,1);
+  }
+  .btn-primary:hover { background:linear-gradient(180deg,#7681e0,#5d6ad0);
+    box-shadow:
+      0 0 0 1px rgba(94,106,210,0.7),
+      0 10px 32px rgba(94,106,210,0.55),
+      0 2px 10px rgba(0,0,0,0.5),
+      inset 0 1px 0 0 rgba(255,255,255,0.3);
+  }
+  .btn-primary:hover::after { transform:translateX(120%); }
+  .btn-primary:active { transform:scale(.98); }
+
+  .btn-secondary {
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 22px; border-radius:10px;
+    background:rgba(255,255,255,0.05);
+    color:#EDEDEF; font-weight:500; font-size:15px;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.06);
+    transition:.25s cubic-bezier(.16,1,.3,1);
+  }
+  .btn-secondary:hover {
+    background:rgba(255,255,255,0.08);
+    border-color:rgba(255,255,255,0.16);
+    transform:translateY(-1px);
+  }
+
+  /* ====== Reveal animation ====== */
+  .reveal { opacity:0; transform:translateY(14px); transition:opacity .45s cubic-bezier(.16,1,.3,1), transform .45s cubic-bezier(.16,1,.3,1); }
+  .reveal.in { opacity:1; transform:none; }
+
+  /* ====== Section seam ====== */
+  .seam {
+    height:1px; width:100%;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+  }
+
+  /* ====== Nav ====== */
+  .nav-blur {
+    backdrop-filter:saturate(160%) blur(14px);
+    -webkit-backdrop-filter:saturate(160%) blur(14px);
+    background:rgba(5,5,6,0.6);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ====== Hero parallax target ====== */
+  .hero-parallax { will-change: transform, opacity; }
+
+  /* ====== Bento variants ====== */
+  .bento {
+    display:grid; gap:14px;
+    grid-template-columns: repeat(6, minmax(0,1fr));
+    grid-auto-rows: 150px;
+  }
+  @media (max-width: 768px) {
+    .bento { grid-template-columns: 1fr; grid-auto-rows:auto; }
+    .bento > * { grid-column: span 1 / span 1 !important; grid-row: auto !important; min-height:140px; }
+  }
+
+  /* ====== Integrations logo grid ====== */
+  .logo-tile {
+    width: 84px; height: 84px;
+    border-radius: 9999px;
+    background:
+      radial-gradient(ellipse at 30% 25%, #ffffff 0%, #f5f5f7 55%, #e5e5e8 100%);
+    display: grid; place-items: center;
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.04),
+      0 10px 28px rgba(0,0,0,0.55),
+      0 0 50px rgba(94,106,210,0.08),
+      inset 0 1px 0 0 rgba(255,255,255,0.6);
+    transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s, border-color .25s;
+    cursor: default;
+  }
+  .logo-tile:hover {
+    transform: translateY(-5px);
+    border-color: rgba(94,106,210,0.30);
+    box-shadow:
+      0 0 0 1px rgba(94,106,210,0.18),
+      0 14px 36px rgba(0,0,0,0.55),
+      0 0 60px rgba(94,106,210,0.22),
+      inset 0 1px 0 0 rgba(255,255,255,0.7);
+  }
+  .logo-tile img {
+    max-width: 100%; max-height: 100%;
+    width: auto; height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.08));
+    user-select: none; -webkit-user-drag: none;
+  }
+  @media (max-width: 640px) {
+    .logo-tile { width: 70px; height: 70px; padding: 14px; }
+  }
+
+  /* Case study logos */
+  .case-logo {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 36px; min-width: 90px;
+    padding: 6px 14px;
+    background: linear-gradient(180deg, #f8f8fb 0%, #e9e9ee 100%);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.03),
+      0 4px 12px rgba(0,0,0,0.4),
+      inset 0 1px 0 0 rgba(255,255,255,0.6);
+  }
+  .case-logo img {
+    max-height: 100%; width: auto;
+    object-fit: contain;
+    user-select: none; -webkit-user-drag: none;
+  }
+
+  /* ====== Logo orbit ====== */
+  .orbit { position:relative; width:100%; aspect-ratio:1/1; max-width:520px; margin:0 auto; }
+  .orbit-ring {
+    position:absolute; inset:0; border:1px dashed rgba(255,255,255,0.08); border-radius:9999px;
+  }
+  .orbit-ring.r2 { inset:14%; border-color:rgba(255,255,255,0.07); }
+  .orbit-ring.r3 { inset:30%; border-color:rgba(255,255,255,0.06); }
+  .orbit-node {
+    position:absolute; width:58px; height:58px;
+    display:grid; place-items:center;
+    border-radius:14px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.10);
+    box-shadow:
+      0 4px 12px rgba(0,0,0,0.45),
+      inset 0 1px 0 0 rgba(255,255,255,0.10);
+    color:#fff; font-weight:600; font-size:11px;
+    transform:translate(-50%,-50%);
+    transition:.3s cubic-bezier(.16,1,.3,1);
+  }
+  .orbit-node:hover {
+    border-color:rgba(94,106,210,0.5);
+    box-shadow:
+      0 6px 20px rgba(94,106,210,0.35),
+      inset 0 1px 0 0 rgba(255,255,255,0.15);
+  }
+  .orbit-center {
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:120px; height:120px; border-radius:24px;
+    background:linear-gradient(180deg, #1a1a25, #0c0c12);
+    border:1px solid rgba(94,106,210,0.35);
+    display:grid; place-items:center;
+    box-shadow:
+      0 0 0 1px rgba(94,106,210,0.25),
+      0 10px 40px rgba(94,106,210,0.35),
+      inset 0 1px 0 0 rgba(255,255,255,0.10);
+  }
+
+  /* ====== Analytics mock ====== */
+  .mock-window {
+    border-radius:18px; overflow:hidden;
+    background:linear-gradient(180deg, #0d0d12, #08080b);
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.04),
+      0 30px 80px rgba(0,0,0,0.7),
+      0 0 120px rgba(94,106,210,0.15);
+  }
+  .mock-bar {
+    height:36px; background:rgba(255,255,255,0.03); border-bottom:1px solid rgba(255,255,255,0.06);
+    display:flex; align-items:center; gap:6px; padding:0 14px;
+  }
+  .dot { width:10px; height:10px; border-radius:9999px; background:rgba(255,255,255,0.10); }
+  .stat-card {
+    padding:16px; border-radius:12px;
+    background:rgba(20,20,28,0.85);
+    border:1px solid rgba(255,255,255,0.09);
+    position:relative;
+  }
+
+  /* Insight callouts */
+  .insight-wrap {
+    position:absolute; pointer-events:none; z-index:25;
+  }
+  .insight-pop {
+    display:inline-flex; align-items:center; gap:12px;
+    padding:14px 20px;
+    background:linear-gradient(180deg, #1d1d2b, #12121a);
+    border:1px solid rgba(94,106,210,0.5);
+    border-radius:14px;
+    font-size:15px; font-weight:500; line-height:1.15; letter-spacing:-0.005em;
+    color:#ededef; white-space:nowrap;
+    box-shadow:
+      0 0 0 1px rgba(94,106,210,0.14),
+      0 16px 40px rgba(0,0,0,0.65),
+      0 0 40px rgba(94,106,210,0.32);
+    backdrop-filter:blur(10px);
+    opacity:0; transform: translateY(-8px) scale(0.94);
+    transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
+    position:relative;
+  }
+  .insight-pop.in { opacity:1; transform: translateY(0) scale(1); }
+  .insight-pop .insight-icon {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:32px; height:32px; border-radius:9px;
+    background:linear-gradient(180deg, rgba(94,106,210,0.45), rgba(94,106,210,0.15));
+    border:1px solid rgba(94,106,210,0.6);
+    color:#d6daff; flex-shrink:0;
+  }
+  .insight-pop .insight-icon svg { width:16px; height:16px; }
+  .insight-pop::after {
+    content:""; position:absolute;
+    width:11px; height:11px;
+    background:#171723;
+    border-right:1px solid rgba(94,106,210,0.5);
+    border-bottom:1px solid rgba(94,106,210,0.5);
+    transform: rotate(45deg);
+  }
+
+  /* per-popup placement */
+  .pop-pageviews { top:8px; right:-20px; transform: translate(22%, -65%); }
+  .pop-pageviews .insight-pop::after { bottom:-6px; left:22px; }
+
+  .pop-devices { top:8px; right:-20px; transform: translate(55%, -65%); }
+  .pop-devices .insight-pop::after { bottom:-6px; left:22px; }
+
+  .pop-overview { top:14px; left:160px; }
+  .pop-overview .insight-pop::after { bottom:-6px; left:22px; }
+
+  /* Document Analytics popups */
+  .pop-slides { top:8px; right:-20px; transform: translate(28%, -65%); }
+  .pop-slides .insight-pop::after { bottom:-6px; left:22px; }
+
+  /* sits at bottom-left of Top viewers, sticking down — arrow points up */
+  .pop-topviewers { top:auto; bottom:24px; left:-20px; transform: translate(-28%, 65%); }
+  .pop-topviewers .insight-pop::after {
+    top:-6px; right:22px; bottom:auto; left:auto;
+    border-right:none; border-bottom:none;
+    border-top:1px solid rgba(94,106,210,0.5);
+    border-left:1px solid rgba(94,106,210,0.5);
+  }
+
+  @media (max-width: 1024px) {
+    .insight-pop { font-size:13.5px; padding:11px 16px; }
+    .insight-pop .insight-icon { width:28px; height:28px; }
+    .pop-pageviews { transform: translate(0, -65%); right:8px; }
+    .pop-devices   { transform: translate(0, -65%); right:8px; }
+    .pop-overview  { left:auto; right:16px; top:50px; }
+    .pop-slides    { transform: translate(0, -65%); right:8px; }
+    .pop-topviewers{ transform: translate(0, 65%); top:auto; bottom:8px; left:8px; right:auto; }
+  }
+  @media (max-width: 640px) {
+    .insight-pop { font-size:12px; padding:9px 13px; gap:9px; }
+    .insight-pop .insight-icon { width:24px; height:24px; }
+    .insight-pop .insight-icon svg { width:13px; height:13px; }
+    .pop-overview { right:8px; top:46px; }
+  }
+  .bar { background:linear-gradient(180deg, #5E6AD2, #3d49a8); border-radius:3px; }
+
+  /* Dashboard tabs */
+  .dash-tabs {
+    display:flex; gap:2px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin: -8px -4px 18px;
+    padding: 0 4px;
+  }
+  .dash-tab {
+    position:relative;
+    display:inline-flex; align-items:center; gap:9px;
+    padding:11px 16px 13px;
+    font-size:13.5px; line-height:1; color:#8A8F98; font-weight:500;
+    border-radius:8px 8px 0 0;
+    transition: color .2s ease-out, background .2s ease-out;
+    cursor:pointer; background:transparent; border:none;
+  }
+  .dash-tab svg { width:15px; height:15px; opacity:.85; }
+  .dash-tab:hover { color:#fff; background: rgba(255,255,255,0.03); }
+  .dash-tab.active { color:#fff; background: rgba(255,255,255,0.04); }
+  .dash-tab.active::after {
+    content:""; position:absolute; left:10px; right:10px; bottom:-1px;
+    height:2px; background: linear-gradient(90deg, #5E6AD2, #9aa3ee);
+    border-radius:2px;
+    box-shadow: 0 0 14px rgba(94,106,210,0.55);
+  }
+  .dash-pane > .grid + .grid,
+  .dash-pane > .grid + .grid + .grid { margin-top: 12px; }
+  .dash-pane.inactive { display:none; }
+  .ov-bar {
+    flex:1; min-width:3px; border-radius:4px 4px 2px 2px;
+    transition: height 1s cubic-bezier(.16,1,.3,1), transform .25s cubic-bezier(.16,1,.3,1), filter .25s;
+  }
+  .ov-bar:hover { transform: translateY(-2px); filter: brightness(1.15); }
+  /* Pre-animate state — applied per pane */
+  .dash-pane.pre-anim .spark-fill { opacity: 0; }
+  .dash-pane.pre-anim .spark-line { opacity: 0; }
+  .dash-pane.pre-anim .kpi-num    { opacity: 0; }
+  .dash-pane.pre-anim .ov-tip,
+  .dash-pane.pre-anim .ov-indicator { opacity: 0; transform: translateY(6px); }
+  .ov-tip, .ov-indicator { transition: opacity .6s ease-out, transform .6s ease-out; transition-delay: 1.6s; }
+  .mock-window .donut-arc { transition: stroke-dasharray 1.2s cubic-bezier(.16,1,.3,1); }
+  .dash-pane.pre-anim .mv-row { opacity:0; transform: translateX(8px); }
+  .mv-row { transition: opacity .5s ease-out, transform .5s ease-out; }
+  @keyframes tipPulse {
+    0%,100% { box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 0 0 rgba(94,106,210,0.0); }
+    50%     { box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 0 6px rgba(94,106,210,0.18); }
+  }
+  .ov-tip.tip-pulse { animation: tipPulse 2.6s ease-in-out 2s infinite; }
+
+  /* ====== Animated underline ====== */
+  .ulink { position:relative; }
+  .ulink::after {
+    content:""; position:absolute; left:0; right:0; bottom:-3px; height:1px;
+    background:linear-gradient(90deg, #5E6AD2, transparent);
+    transform: scaleX(0); transform-origin:left; transition:transform .3s ease-out;
+  }
+  .ulink:hover::after { transform:scaleX(1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob, .grad-accent { animation:none !important; }
+    .reveal { opacity:1; transform:none; transition:none; }
+  }
+
+  /* ====== USE CASES ====== */
+  .usecase-block + .usecase-block { margin-top: 7rem; }
+  .uc-eyebrow {
+    font-family:'JetBrains Mono', ui-monospace, monospace;
+    font-size:11px; letter-spacing:0.22em; text-transform:uppercase;
+    color:#9aa3ee; font-weight:500;
+    display:inline-flex; align-items:center; gap:10px;
+  }
+  .uc-eyebrow::before {
+    content:""; width:24px; height:1px; background:linear-gradient(90deg, #5E6AD2, transparent);
+  }
+  .uc-title { background-clip:text; -webkit-background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+  .uc-title-1 { background-image: linear-gradient(135deg, #f4748f 0%, #c66ab3 55%, #9aa3ee 100%); }
+  .uc-title-2 { background-image: linear-gradient(135deg, #9aa3ee 0%, #5E6AD2 55%, #6b8df0 100%); }
+  .uc-title-3 { background-image: linear-gradient(135deg, #34d399 0%, #6ee7b7 55%, #5E6AD2 100%); }
+
+  /* Visual mockup wrapper */
+  .uc-visual {
+    position:relative; aspect-ratio:5/3;
+    border-radius:18px;
+    background:linear-gradient(180deg, #131320 0%, #0a0a14 100%);
+    border:1px solid rgba(255,255,255,0.07);
+    overflow:hidden;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.02),
+      0 30px 80px rgba(0,0,0,0.55),
+      0 0 80px rgba(94,106,210,0.10);
+  }
+  .uc-visual::after {
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse at 25% 15%, rgba(94,106,210,0.20), transparent 55%),
+      radial-gradient(ellipse at 75% 90%, rgba(198,106,179,0.13), transparent 55%);
+  }
+
+  /* Item icon container */
+  .uc-icon {
+    width:44px; height:44px;
+    display:inline-grid; place-items:center;
+    border-radius:11px;
+    background:linear-gradient(180deg, rgba(94,106,210,0.22), rgba(94,106,210,0.05));
+    border:1px solid rgba(94,106,210,0.32);
+    color:#d6daff; flex-shrink:0;
+    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.06);
+  }
+  .uc-icon svg { width:18px; height:18px; }
+
+  /* Per-use-case icon tint */
+  .uc-block-1 .uc-icon { background:linear-gradient(180deg, rgba(244,116,143,0.20), rgba(244,116,143,0.04)); border-color: rgba(244,116,143,0.35); color:#f7c0cc; }
+  .uc-block-2 .uc-icon { background:linear-gradient(180deg, rgba(154,163,238,0.22), rgba(154,163,238,0.05)); border-color: rgba(154,163,238,0.35); color:#d6daff; }
+  .uc-block-3 .uc-icon { background:linear-gradient(180deg, rgba(52,211,153,0.20), rgba(52,211,153,0.04)); border-color: rgba(52,211,153,0.35); color:#a7f3d0; }
+
+  /* Carousel */
+  .carousel { position:relative; }
+  .carousel-viewport {
+    overflow-x:auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -4px;
+    padding: 4px 4px 6px;
+  }
+  .carousel-viewport::-webkit-scrollbar { display:none; }
+  .carousel-track {
+    display:flex; gap:16px;
+    counter-reset: ucn;
+  }
+  .carousel-card {
+    flex: 0 0 calc((100% - 48px) / 4); /* exactly 4 per row, 3 gaps of 16px */
+    min-width: 220px;
+    scroll-snap-align: start;
+  }
+
+  /* Card number (CSS counter) — works for both carousel and grid */
+  .uc-grid-static { counter-reset: ucn; }
+  .uc-card { counter-increment: ucn; }
+  .uc-card::after {
+    content: counter(ucn, decimal-leading-zero);
+    position: absolute;
+    top: 16px; right: 18px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.30);
+    font-weight: 500;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  @media (max-width: 1024px) {
+    .carousel-card { flex-basis: calc((100% - 32px) / 3); } /* 3 per row */
+  }
+  @media (max-width: 768px) {
+    .carousel-card { flex-basis: calc((100% - 16px) / 2); min-width: 0; } /* 2 per row */
+  }
+  .carousel-btn {
+    position:absolute;
+    top: calc(50% - 16px);  /* offset up to compensate for dots row below */
+    transform: translateY(-50%);
+    width:44px; height:44px;
+    border-radius:9999px;
+    background: rgba(20,20,30,0.92);
+    border:1px solid rgba(255,255,255,0.10);
+    color:#fff; cursor:pointer;
+    display:grid; place-items:center;
+    z-index: 5;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.55), inset 0 1px 0 0 rgba(255,255,255,0.08);
+    transition: background .25s, border-color .25s, transform .2s cubic-bezier(.16,1,.3,1), opacity .25s;
+  }
+  .carousel-btn:hover:not(:disabled) {
+    background: rgba(94,106,210,0.22);
+    border-color: rgba(94,106,210,0.50);
+    transform: translateY(-50%) scale(1.06);
+  }
+  .carousel-btn:disabled { opacity:0.25; cursor:default; }
+  .carousel-btn.prev { left: -54px; }
+  .carousel-btn.next { right: -54px; }
+  .carousel-btn svg { width:16px; height:16px; }
+  .carousel-dots {
+    display:flex; gap:7px; justify-content:center; align-items:center;
+    margin-top: 22px;
+  }
+
+  /* On narrower desktops, pull buttons in if there's not enough margin */
+  @media (max-width: 1280px) {
+    .carousel-btn.prev { left: -48px; }
+    .carousel-btn.next { right: -48px; }
+  }
+  @media (max-width: 1080px) {
+    .carousel-btn { width: 40px; height: 40px; }
+    .carousel-btn.prev { left: -46px; }
+    .carousel-btn.next { right: -46px; }
+  }
+  .carousel-dot {
+    width:7px; height:7px; border-radius:9999px;
+    background:rgba(255,255,255,0.16);
+    border:none; cursor:pointer; padding:0;
+    transition: width .4s cubic-bezier(.16,1,.3,1), background .25s, box-shadow .25s;
+  }
+  .carousel-dot.active {
+    width:24px; border-radius:4px;
+    background:#5E6AD2;
+    box-shadow: 0 0 14px rgba(94,106,210,0.55);
+  }
+
+  @media (max-width: 768px) {
+    .carousel-btn { display:none; }
+    .usecase-block + .usecase-block { margin-top: 5rem; }
+  }
+
+  /* =============================================================
+     RESPONSIVE QA — Tablet (≤1024) & Mobile (≤768 / ≤640)
+     ============================================================= */
+
+  /* --- Mobile: hide all insight popups completely --- */
+  @media (max-width: 768px) {
+    .insight-wrap { display: none !important; }
+  }
+
+  /* --- Tablet polish (768-1024) --- */
+  @media (max-width: 1024px) {
+    /* Mock window padding & inner spacing slightly tighter */
+    .mock-window .mock-bar { padding: 0 12px; }
+    /* Dashboard chart heights a touch shorter so they don't dominate */
+    .dash-pane .h-44.lg\:h-52 { height: 12rem; }
+  }
+
+  /* --- Mobile dashboard compaction (≤640px) --- */
+  @media (max-width: 640px) {
+    /* Outer mock-window/section padding compaction */
+    #analytics .mock-window > div.p-5,
+    #analytics .mock-window > div[class*="p-5"] { padding: 14px !important; }
+    .mock-bar { padding: 0 10px !important; height: 32px; }
+    .mock-bar > span:last-child {           /* the URL string */
+      font-size: 9.5px; white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; flex: 1; min-width: 0; margin-left: 8px;
+    }
+
+    /* Tabs compact */
+    .dash-tab { padding: 9px 11px 11px; font-size: 12px; gap: 6px; }
+    .dash-tab svg { width: 13px; height: 13px; }
+    .dash-tabs { margin: -6px -2px 14px; padding: 0 2px; }
+
+    /* Stat-card slimmer padding */
+    .stat-card { padding: 12px; }
+
+    /* KPI numbers shrink so 6-digit values don't overflow narrow cards */
+    .stat-card .kpi-num.text-2xl { font-size: 1.25rem !important; line-height: 1.15; }
+    .stat-card .kpi-num.text-lg  { font-size: 1rem !important;     line-height: 1.15; }
+
+    /* Sparklines — slim them down */
+    .stat-card svg.w-20, .stat-card svg.w-24, .stat-card svg.w-28 {
+      width: 48px !important; height: 24px !important;
+    }
+
+    /* Donut chart smaller */
+    .stat-card svg.w-16.h-16 { width: 44px !important; height: 44px !important; }
+
+    /* Devices breakdown 3-col grid tighter */
+    .stat-card .grid.grid-cols-3 { gap: 6px; }
+
+    /* Bar-chart inner padding (y-axis area) tighter */
+    .dash-pane .pl-9 { padding-left: 24px; }
+
+    /* Chart heights */
+    .dash-pane .h-44, .dash-pane .h-52 { height: 130px !important; }
+
+    /* Bars tighter — keep visible */
+    .dash-pane .ov-bar { min-width: 2px; }
+
+    /* Hide bottom 14-day trend on Devices to save vertical space */
+    /* (keeps card compact on phones) */
+
+    /* Overview chart x-axis labels — only every other one */
+    .dash-pane .pl-9.mt-2 > div:nth-child(odd) { color: transparent; }
+
+    /* Tooltip on bar chart — smaller */
+    .ov-tip { font-size: 10px !important; padding: 6px 10px !important; }
+  }
+
+  /* --- Very narrow (≤380) — extra rescue --- */
+  @media (max-width: 380px) {
+    .stat-card .kpi-num.text-2xl { font-size: 1.1rem !important; }
+    .mock-bar > span:last-child { display: none; }
+    .dash-tab { padding: 9px 9px 11px; font-size: 11.5px; }
+  }
+</style>
+</head>
+<body class="bg-base text-fg antialiased relative">
+
+<!-- ============ Ambient background ============ -->
+<div class="bg-shell" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+  <div class="bg-noise"></div>
+</div>
+
+<!-- ============ Nav ============ -->
+<header class="fixed top-0 inset-x-0 z-50 nav-blur">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-3 group">
+      <img src="https://cdn.relayto.com/images_originals/RELAYTO%20AIlogowhite_6998769577846d56171bddd3.png"
+           alt="RELAYTO.AI"
+           class="h-6 w-auto select-none" draggable="false" />
+      <span class="hidden sm:inline-block text-[11px] font-mono tracking-widest text-muted pl-3 border-l border-white/10">LIFE&nbsp;SCIENCES</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-7 text-[14px] text-muted">
+      <a href="#areas" class="ulink hover:text-white transition">Solutions</a>
+      <a href="#analytics" class="ulink hover:text-white transition">Analytics</a>
+      <a href="#integrations" class="ulink hover:text-white transition">Integrations</a>
+      <a href="#labs" class="ulink hover:text-white transition">Labs</a>
+      <a href="#cases" class="ulink hover:text-white transition">Customers</a>
+    </nav>
+    <div class="flex items-center gap-3">
+      <a href="#book" class="btn-primary !py-2.5 !px-4 !text-[13px]">Book a Call
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <button id="menuBtn" class="md:hidden p-2 rounded-md text-muted hover:text-white" aria-label="Menu">
+        <svg id="iconMenu" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg id="iconClose" viewBox="0 0 24 24" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile -->
+  <div id="mobileMenu" class="md:hidden hidden border-t border-white/[0.06] bg-base/95 backdrop-blur-xl">
+    <div class="px-6 py-5 flex flex-col gap-4 text-[15px]">
+      <a href="#areas" class="text-muted hover:text-white">Solutions</a>
+      <a href="#analytics" class="text-muted hover:text-white">Analytics</a>
+      <a href="#integrations" class="text-muted hover:text-white">Integrations</a>
+      <a href="#labs" class="text-muted hover:text-white">Labs</a>
+      <a href="#cases" class="text-muted hover:text-white">Customers</a>
+      <a href="#book" class="btn-primary justify-center mt-2">Book a Call</a>
+    </div>
+  </div>
+</header>
+
+<main class="relative z-10 pt-16">
+
+<!-- ============ SECTION 1 — HERO ============ -->
+<section class="relative min-h-[100vh] flex items-center">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 py-24 lg:py-32 w-full hero-parallax">
+    <div class="reveal flex items-center gap-2 mb-6">
+      <span class="chip"><span class="chip-dot"></span>RELAYTO.AI · Healthcare &amp; Life Sciences</span>
+    </div>
+
+    <h1 class="reveal grad-text font-semibold tracking-[-0.03em] leading-[0.95]
+               text-5xl sm:text-6xl lg:text-7xl xl:text-[88px] max-w-5xl">
+      The Content Intelligence Platform for
+      <span class="grad-accent">Life Sciences.</span>
+    </h1>
+
+    <p class="reveal mt-8 max-w-2xl text-lg sm:text-xl text-muted leading-relaxed">
+      Power every content experience — investor decks, medical comms, HCP journeys, training and beyond — securely and at scale. One platform. Real-time intelligence. Built for regulated industries.
+    </p>
+
+    <div class="reveal mt-10 flex flex-wrap items-center gap-3">
+      <a href="#book" class="btn-primary">Book a Call
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#video" class="btn-secondary">
+        <span class="inline-flex w-5 h-5 items-center justify-center rounded-full bg-white/10">
+          <svg viewBox="0 0 24 24" class="w-3 h-3 text-white" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </span>
+        Watch 3-min overview
+      </a>
+    </div>
+
+    <!-- Live stat strip -->
+    <div class="reveal mt-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-white/[0.06] rounded-2xl overflow-hidden border border-white/[0.06]">
+      <div class="bg-base/70 backdrop-blur p-6">
+        <div class="eyebrow mb-2">Compliance</div>
+        <div class="text-2xl font-semibold tracking-tight">SOC&nbsp;2 · HIPAA</div>
+        <div class="text-xs text-muted mt-1">Type II + GDPR</div>
+      </div>
+      <div class="bg-base/70 backdrop-blur p-6">
+        <div class="eyebrow mb-2">Scale</div>
+        <div class="text-2xl font-semibold tracking-tight">1B+ events</div>
+        <div class="text-xs text-muted mt-1">processed monthly</div>
+      </div>
+      <div class="bg-base/70 backdrop-blur p-6">
+        <div class="eyebrow mb-2">Speed</div>
+        <div class="text-2xl font-semibold tracking-tight">&lt; 90&nbsp;sec</div>
+        <div class="text-xs text-muted mt-1">deck → interactive</div>
+      </div>
+      <div class="bg-base/70 backdrop-blur p-6">
+        <div class="eyebrow mb-2">Deployed by</div>
+        <div class="text-2xl font-semibold tracking-tight">Top&nbsp;20 Pharma</div>
+        <div class="text-xs text-muted mt-1">& biotech leaders</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll cue -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-muted text-[11px] font-mono tracking-widest flex flex-col items-center gap-2 opacity-70">
+    <span>SCROLL</span>
+    <span class="block w-px h-8 bg-gradient-to-b from-white/40 to-transparent"></span>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ SECTION 2 — THREE AREAS WE SUPPORT ============ -->
+<section id="areas" class="py-24 lg:py-32">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="reveal max-w-3xl mb-14">
+      <div class="eyebrow mb-4">/ Who we serve</div>
+      <h2 class="grad-text text-4xl lg:text-5xl font-semibold tracking-tight">Three areas we support.</h2>
+      <p class="mt-4 text-muted text-lg">From early-stage biotech to global pharma — and the consultancies that serve them — RELAYTO.AI adapts to the regulatory, commercial, and scientific demands of each.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5">
+      <!-- Pharma -->
+      <article class="surface p-7 reveal" data-card>
+        <div class="surface-top-line"></div>
+        <div class="flex items-center justify-between">
+          <span class="inline-flex w-11 h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-accent">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 3v18M16 3v18M3 8h18M3 16h18"/></svg>
+          </span>
+          <span class="eyebrow">01 / Pharma</span>
+        </div>
+        <h3 class="mt-5 text-2xl font-semibold tracking-tight">Pharma</h3>
+        <p class="mt-3 text-muted leading-relaxed">Compliant, scalable content for commercial and medical teams. MLR-ready. Global-to-local at speed.</p>
+        <ul class="mt-6 space-y-2 text-sm text-muted">
+          <li class="flex gap-2"><span class="text-accent">→</span>Branded HCP &amp; patient portals</li>
+          <li class="flex gap-2"><span class="text-accent">→</span>MLR-approved asset libraries</li>
+          <li class="flex gap-2"><span class="text-accent">→</span>Congress &amp; eDetail experiences</li>
+        </ul>
+      </article>
+      <!-- Biotech -->
+      <article class="surface p-7 reveal" data-card>
+        <div class="surface-top-line"></div>
+        <div class="flex items-center justify-between">
+          <span class="inline-flex w-11 h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-accent">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3v6a5 5 0 0 0 10 0V3M7 21v-6a5 5 0 0 1 10 0v6"/></svg>
+          </span>
+          <span class="eyebrow">02 / Biotech</span>
+        </div>
+        <h3 class="mt-5 text-2xl font-semibold tracking-tight">Biotech</h3>
+        <p class="mt-3 text-muted leading-relaxed">Investor storytelling, clinical comms and go-to-market — from early stage through launch.</p>
+        <ul class="mt-6 space-y-2 text-sm text-muted">
+          <li class="flex gap-2"><span class="text-accent">→</span>Investor decks &amp; data rooms</li>
+          <li class="flex gap-2"><span class="text-accent">→</span>Clinical &amp; medical narratives</li>
+          <li class="flex gap-2"><span class="text-accent">→</span>Launch microsites</li>
+        </ul>
+      </article>
+      <!-- Consultancies -->
+      <article class="surface p-7 reveal" data-card>
+        <div class="surface-top-line"></div>
+        <div class="flex items-center justify-between">
+          <span class="inline-flex w-11 h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-accent">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+          </span>
+          <span class="eyebrow">03 / Consultancies</span>
+        </div>
+        <h3 class="mt-5 text-2xl font-semibold tracking-tight">Consultancies</h3>
+        <p class="mt-3 text-muted leading-relaxed">Best-in-class content solutions for the life sciences clients you serve — white-labeled and ready.</p>
+        <ul class="mt-6 space-y-2 text-sm text-muted">
+          <li class="flex gap-2"><span class="text-accent">→</span>Multi-client workspaces</li>
+          <li class="flex gap-2"><span class="text-accent">→</span>Reusable templates &amp; brand kits</li>
+          <li class="flex gap-2"><span class="text-accent">→</span>Engagement reporting</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ SECTIONS 3-5 — USE CASES ============ -->
+<section id="use-cases" class="py-24 lg:py-32">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+
+    <div class="reveal max-w-3xl mb-20">
+      <div class="eyebrow mb-4">/ Use cases</div>
+      <h2 class="grad-text text-4xl lg:text-5xl font-semibold tracking-tight">Built for the work life sciences teams actually do.</h2>
+      <p class="mt-4 text-muted text-lg">Three distinct use cases, one platform — from mission-critical securings to dynamic experiences to live analytics.</p>
+    </div>
+
+    <!-- ===== USE CASE 01 — Mission Critical ===== -->
+    <div class="usecase-block uc-block-1">
+      <div class="mb-12 lg:mb-14 reveal max-w-4xl">
+        <div class="uc-eyebrow mb-5">USE CASE 01 · Mission Critical</div>
+        <h3 class="uc-title uc-title-1 text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.05]">Mission-Critical Communications</h3>
+        <p class="mt-6 text-muted text-lg leading-relaxed max-w-2xl">From IPO roadshows to internal medical reviews — high-stakes content needs the right environment. Hardened, compliant spaces with permissioned access, watermarking and full audit trails.</p>
+      </div>
+
+      <!-- Carousel -->
+      <div class="carousel reveal" data-carousel data-autorotate="5500">
+        <div class="carousel-viewport">
+          <div class="carousel-track">
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Investor Rooms</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Permissioned, watermarked, fully tracked. Know exactly which slide each investor reads.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Investor Decks</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">IPO roadshows, round updates and ongoing investor narratives.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Confidential Decks</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Board, partner and M&amp;A reviews — shielded with revocable access.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6v6l4 11a2 2 0 0 1-2 3H7a2 2 0 0 1-2-3l4-11z"/><path d="M9 8h6"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Medical &amp; Clinical Decks</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">MLR-aligned content delivered to HCPs at congress and in field.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Corporate Comms</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Town halls, internal updates and leadership briefings.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-6v14L3 13v-2z"/><path d="M11 13v6"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Commercial Comms</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Sales enablement and customer-facing assets, brand-aligned.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Marketing</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Campaign decks, launch narratives, multi-market microsites.</p>
+            </article>
+          </div>
+        </div>
+        <button class="carousel-btn prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="carousel-btn next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        <div class="carousel-dots"></div>
+      </div>
+    </div>
+
+    <!-- ===== USE CASE 02 — Interactive Content ===== -->
+    <div class="usecase-block uc-block-2">
+      <div class="mb-12 lg:mb-14 reveal max-w-4xl">
+        <div class="uc-eyebrow mb-5">USE CASE 02 · Interactive Content</div>
+        <h3 class="uc-title uc-title-2 text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.05]">Interactive Content That Performs</h3>
+        <p class="mt-6 text-muted text-lg leading-relaxed max-w-2xl">Static materials become dynamic experiences — for HCPs, patients and payers. Adaptive checkpoints, embedded video, CTAs and audience routing built in.</p>
+      </div>
+
+      <!-- Carousel -->
+      <div class="carousel reveal" data-carousel data-autorotate="5500">
+        <div class="carousel-viewport">
+          <div class="carousel-track">
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Training &amp; Learning</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">SCORM-friendly modules with adaptive checkpoints and progress tracking.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Capabilities</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Pitch the science. Show the platform. Tell the company story.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Education</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Disease state, MoA, evidence libraries for HCPs and learners.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Promotional</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">MLR-approved messaging at brand scale across markets.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Non-Promotional</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Unbranded disease awareness and patient advocacy hubs.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 1 0 0 20 1.5 1.5 0 0 0 1.06-.44 1.5 1.5 0 0 0 0-2.12A1.5 1.5 0 0 1 14.12 17H16a6 6 0 0 0 6-6c0-4.97-4.48-9-10-9z"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Branded Content</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Editorial-grade experiences, on-brand and on-message.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v6a4 4 0 0 0 8 0V2"/><path d="M12 8a4 4 0 0 0 4 4h4"/><path d="M20 12v6a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-6"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">HCP</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Verified clinician journeys with the right level of clinical depth.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Patient</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Plain-language journeys with accessibility built in.</p>
+            </article>
+            <article class="carousel-card uc-card surface p-6" data-card>
+              <div class="surface-top-line"></div>
+              <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M16 13a2 2 0 1 1 0-2"/><path d="M2 10h20"/></svg></div>
+              <h4 class="text-lg font-semibold mt-5">Payer</h4>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Economic models, HEOR data and value narratives.</p>
+            </article>
+          </div>
+        </div>
+        <button class="carousel-btn prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="carousel-btn next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        <div class="carousel-dots"></div>
+      </div>
+    </div>
+
+    <!-- ===== USE CASE 03 — Real-Time Insights ===== -->
+    <div class="usecase-block uc-block-3" id="analytics-cards">
+      <div class="mb-12 lg:mb-14 reveal max-w-4xl">
+        <div class="uc-eyebrow mb-5">USE CASE 03 · Real-Time Insights</div>
+        <h3 class="uc-title uc-title-3 text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.05]">Customer-Level Real-Time Insights</h3>
+        <p class="mt-6 text-muted text-lg leading-relaxed max-w-2xl">Five lenses of analytics — surfaced live, not in monthly reports. Understand what's read, by whom, for how long, and where it goes next.</p>
+      </div>
+
+      <!-- 5 cards in one row (no carousel) -->
+      <div class="uc-grid-static grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 reveal">
+        <article class="uc-card surface p-6" data-card>
+          <div class="surface-top-line"></div>
+          <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+          <h4 class="text-lg font-semibold mt-5">Hub-Level</h4>
+          <p class="text-sm text-muted mt-2 leading-relaxed">Portfolio-wide traffic, depth and conversion across every hub.</p>
+        </article>
+        <article class="uc-card surface p-6" data-card>
+          <div class="surface-top-line"></div>
+          <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg></div>
+          <h4 class="text-lg font-semibold mt-5">Content-Level</h4>
+          <p class="text-sm text-muted mt-2 leading-relaxed">Heatmaps per slide, page and asset — second-by-second.</p>
+        </article>
+        <article class="uc-card surface p-6" data-card>
+          <div class="surface-top-line"></div>
+          <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V15"/></svg></div>
+          <h4 class="text-lg font-semibold mt-5">Campaign-Level</h4>
+          <p class="text-sm text-muted mt-2 leading-relaxed">Cohorts, channels, multi-touch attribution and ROI.</p>
+        </article>
+        <article class="uc-card surface p-6" data-card>
+          <div class="surface-top-line"></div>
+          <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <h4 class="text-lg font-semibold mt-5">User-Level</h4>
+          <p class="text-sm text-muted mt-2 leading-relaxed">Named-account journeys and intent signals — live.</p>
+        </article>
+        <article class="uc-card surface p-6" data-card>
+          <div class="surface-top-line"></div>
+          <div class="uc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></div>
+          <h4 class="text-lg font-semibold mt-5">Referral-Level</h4>
+          <p class="text-sm text-muted mt-2 leading-relaxed">First-touch &amp; share-graph attribution across networks.</p>
+        </article>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ SECTION 6 — CONTENT TYPES CHIP STRIP ============ -->
+<section class="py-20 lg:py-24">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="reveal flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8">
+      <div>
+        <div class="eyebrow mb-3">/ Every format</div>
+        <h2 class="grad-text text-3xl lg:text-4xl font-semibold tracking-tight">Built for every format your teams need.</h2>
+      </div>
+      <span class="text-muted text-sm">— and any new one you invent.</span>
+    </div>
+    <div class="reveal flex flex-wrap gap-2.5">
+      <span class="chip"><span class="chip-dot"></span>eDetails</span>
+      <span class="chip"><span class="chip-dot"></span>Campaign Microsites</span>
+      <span class="chip"><span class="chip-dot"></span>Learning &amp; Training Content</span>
+      <span class="chip"><span class="chip-dot"></span>Agency Resources Portal</span>
+      <span class="chip"><span class="chip-dot"></span>Brand, HCP &amp; Patient Portals</span>
+      <span class="chip"><span class="chip-dot"></span>Audio &amp; Video Hubs</span>
+      <span class="chip"><span class="chip-dot"></span>Global-to-Local Asset Libraries</span>
+      <span class="chip"><span class="chip-dot"></span>Bespoke Congress Solutions</span>
+      <span class="chip"><span class="chip-dot"></span>Interactive HCP Journeys</span>
+      <span class="chip text-muted italic">… and more</span>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ SECTION 7 — INTEGRATIONS ============ -->
+<section id="integrations" class="py-24 lg:py-32">
+  <div class="max-w-6xl mx-auto px-6 lg:px-10">
+    <div class="text-center max-w-3xl mx-auto mb-16 reveal">
+      <div class="eyebrow mb-4">/ Integrations</div>
+      <h2 class="grad-text text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.05]">
+        Works seamlessly with your existing technology.
+      </h2>
+      <p class="mt-5 text-muted text-lg leading-relaxed">
+        Plug RELAYTO.AI into your CRM, MLR, DAM and collaboration stack. SSO, SCIM and granular APIs come standard — so your content moves where your teams already work.
+      </p>
+    </div>
+
+    <!-- Logo grid -->
+    <div class="reveal space-y-7 sm:space-y-9">
+      <!-- Row 1 -->
+      <div class="flex flex-wrap justify-center gap-x-7 gap-y-7 sm:gap-x-10 sm:gap-y-9">
+        <div class="logo-tile" title="Google Drive">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/Google_Drive_icon_(2020).svg?width=512" alt="Google Drive" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="SAP SuccessFactors">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/SAP_2011_logo.svg?width=512" alt="SAP" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Cornerstone OnDemand">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/Cornerstone_OnDemand_logo.svg?width=512" alt="Cornerstone OnDemand" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Microsoft SharePoint">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/Microsoft_Office_SharePoint_(2019%E2%80%93present).svg?width=512" alt="SharePoint" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="ClickUp">
+          <img src="https://icon.horse/icon/clickup.com" alt="ClickUp" loading="lazy" />
+        </div>
+      </div>
+      <!-- Row 2 -->
+      <div class="flex flex-wrap justify-center gap-x-7 gap-y-7 sm:gap-x-10 sm:gap-y-9">
+        <div class="logo-tile" title="WordPress">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/WordPress_blue_logo.svg?width=512" alt="WordPress" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Salesforce">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/Salesforce.com_logo.svg?width=512" alt="Salesforce" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Adobe">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/Adobe_Corporate_logo.svg?width=512" alt="Adobe" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Marketo">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/Marketo_logo.svg?width=512" alt="Marketo" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="HubSpot">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/HubSpot_Logo.svg?width=512" alt="HubSpot" loading="lazy" />
+        </div>
+      </div>
+      <!-- Row 3 -->
+      <div class="flex flex-wrap justify-center gap-x-7 gap-y-7 sm:gap-x-10 sm:gap-y-9">
+        <div class="logo-tile" title="Smartsheet">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/Smartsheet_Horizontal_Logo.png?width=512" alt="Smartsheet" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Bynder">
+          <img src="https://icon.horse/icon/bynder.com" alt="Bynder" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Outreach">
+          <img src="https://icon.horse/icon/outreach.io" alt="Outreach" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="6sense">
+          <img src="https://icon.horse/icon/6sense.com" alt="6sense" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Highspot">
+          <img src="https://icon.horse/icon/highspot.com" alt="Highspot" loading="lazy" />
+        </div>
+      </div>
+      <!-- Row 4 -->
+      <div class="flex flex-wrap justify-center gap-x-7 gap-y-7 sm:gap-x-10 sm:gap-y-9">
+        <div class="logo-tile" title="Google Slides">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/Google_Slides_2020_Logo.svg?width=512" alt="Google Slides" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Microsoft PowerPoint">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/Microsoft_Office_PowerPoint_(2019%E2%80%93present).svg?width=512" alt="PowerPoint" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Microsoft Office">
+          <img src="https://icon.horse/icon/microsoft.com" alt="Microsoft Office" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Microsoft Excel">
+          <img src="https://en.wikipedia.org/wiki/Special:FilePath/Microsoft_Office_Excel_(2019%E2%80%93present).svg?width=512" alt="Excel" loading="lazy" />
+        </div>
+        <div class="logo-tile" title="Claude AI">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Claude_AI_symbol.svg/960px-Claude_AI_symbol.svg.png" alt="Claude AI" loading="lazy" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust strip -->
+    <ul class="mt-16 reveal flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm">
+      <li class="flex items-center gap-2 text-muted"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span>SAML / OAuth SSO</li>
+      <li class="flex items-center gap-2 text-muted"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span>Veeva Vault sync</li>
+      <li class="flex items-center gap-2 text-muted"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span>Salesforce engagement events</li>
+      <li class="flex items-center gap-2 text-muted"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span>Webhooks &amp; REST API</li>
+    </ul>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ SECTION 8 — CASE STUDIES ============ -->
+<section id="cases" class="py-24 lg:py-32">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="reveal flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-14">
+      <div>
+        <div class="eyebrow mb-4">/ Case studies</div>
+        <h2 class="grad-text text-4xl lg:text-5xl font-semibold tracking-tight">Trusted by leaders in life sciences.</h2>
+      </div>
+      <a href="#" class="text-sm text-muted hover:text-white inline-flex items-center gap-1.5 group">
+        View all customer stories
+        <svg class="w-4 h-4 transition group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5">
+      <!-- Salesforce -->
+      <article class="surface p-7 reveal flex flex-col" data-card>
+        <div class="surface-top-line"></div>
+        <div class="flex items-center justify-between">
+          <span class="case-logo"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqmRAdsy-dy5wFuVnHQiOUm9RyUDOEhLpHlA&s" alt="Salesforce" loading="lazy" /></span>
+          <span class="eyebrow">CASE STUDY</span>
+        </div>
+        <p class="mt-6 text-muted leading-relaxed">"RELAYTO.AI helped us cut our deck production cycle by 60% while maintaining brand integrity across 12 markets."</p>
+        <div class="mt-8 grid grid-cols-2 gap-4 pt-6 border-t border-white/[0.06]">
+          <div><div class="text-2xl font-semibold tracking-tight">60%</div><div class="text-xs text-muted mt-1">Faster delivery</div></div>
+          <div><div class="text-2xl font-semibold tracking-tight">12</div><div class="text-xs text-muted mt-1">Markets</div></div>
+        </div>
+      </article>
+      <!-- Hotspot -->
+      <article class="surface p-7 reveal flex flex-col" data-card>
+        <div class="surface-top-line"></div>
+        <div class="flex items-center justify-between">
+          <span class="case-logo"><img src="https://srone.ams3.cdn.digitaloceanspaces.com/uploads/_432x196_fit_center-center_none_ns/hotspot-logo.png" alt="Hotspot Therapeutics" loading="lazy" /></span>
+          <span class="eyebrow">CASE STUDY</span>
+        </div>
+        <p class="mt-6 text-muted leading-relaxed">"Our investor data room ran entirely on RELAYTO. We knew which slides each fund opened, in real time."</p>
+        <div class="mt-8 grid grid-cols-2 gap-4 pt-6 border-t border-white/[0.06]">
+          <div><div class="text-2xl font-semibold tracking-tight">$100M+</div><div class="text-xs text-muted mt-1">Raised on platform</div></div>
+          <div><div class="text-2xl font-semibold tracking-tight">42</div><div class="text-xs text-muted mt-1">Investors tracked</div></div>
+        </div>
+      </article>
+      <!-- Abbott -->
+      <article class="surface p-7 reveal flex flex-col" data-card>
+        <div class="surface-top-line"></div>
+        <div class="flex items-center justify-between">
+          <span class="case-logo"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Abbott_Laboratories_logo.svg/3840px-Abbott_Laboratories_logo.svg.png" alt="Abbott" loading="lazy" /></span>
+          <span class="eyebrow">CASE STUDY</span>
+        </div>
+        <p class="mt-6 text-muted leading-relaxed">"We unified HCP, patient and internal portals onto one platform — with audit trails our compliance team actually trusts."</p>
+        <div class="mt-8 grid grid-cols-2 gap-4 pt-6 border-t border-white/[0.06]">
+          <div><div class="text-2xl font-semibold tracking-tight">3 → 1</div><div class="text-xs text-muted mt-1">Platforms consolidated</div></div>
+          <div><div class="text-2xl font-semibold tracking-tight">100%</div><div class="text-xs text-muted mt-1">Audit pass rate</div></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ SECTION 9 — VIDEO ============ -->
+<section id="video" class="py-24 lg:py-32 relative">
+  <!-- extra dark backdrop -->
+  <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-transparent pointer-events-none"></div>
+  <div class="relative max-w-5xl mx-auto px-6 lg:px-10 text-center">
+    <div class="eyebrow mb-4 reveal">/ Watch</div>
+    <h2 class="grad-text text-4xl lg:text-5xl font-semibold tracking-tight reveal">
+      What is RELAYTO.AI? <span class="text-muted">Explained in 3 minutes.</span>
+    </h2>
+
+    <div class="mt-12 reveal">
+      <div id="videoFrame" class="relative rounded-2xl overflow-hidden border border-white/[0.08]
+                  shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_40px_120px_rgba(0,0,0,0.6),0_0_120px_rgba(94,106,210,0.18)]">
+        <video id="explainerVideo"
+               class="block w-full aspect-video bg-black"
+               preload="metadata"
+               playsinline
+               controls
+               poster=""
+               src="https://cdn.relayto.com/media/files/RELAYTOVideoAbouttheplatform_682b3fa495f86a3a798beaf3.mp4">
+          Your browser does not support the video tag.
+        </video>
+
+        <!-- Play overlay (disappears when video starts) -->
+        <button id="videoPlayOverlay"
+                aria-label="Play video"
+                class="absolute inset-0 grid place-items-center z-10
+                       bg-[radial-gradient(ellipse_at_center,rgba(15,16,32,0.55)_0%,rgba(6,6,10,0.85)_60%,rgba(2,2,3,0.92)_100%)]
+                       transition-opacity duration-500">
+          <span class="group relative inline-flex w-20 h-20 rounded-full items-center justify-center
+                       bg-white/[0.08] border border-white/[0.18] backdrop-blur
+                       shadow-[0_8px_40px_rgba(94,106,210,0.45)]
+                       transition group-hover:scale-105">
+            <span class="absolute inset-0 rounded-full border border-accent/40 animate-ping opacity-50"></span>
+            <svg viewBox="0 0 24 24" class="w-7 h-7 text-white translate-x-0.5" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </span>
+          <!-- chrome (sits above the overlay backdrop) -->
+          <div class="absolute top-4 left-4 flex gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-white/15"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-white/15"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-white/15"></span>
+          </div>
+          <div class="absolute bottom-4 right-4 text-[11px] font-mono text-muted tracking-widest">PLAY</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ SECTION 10 — ANALYTICS DASHBOARD ============ -->
+<section id="analytics" class="py-24 lg:py-32">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="text-center max-w-3xl mx-auto mb-14 reveal">
+      <div class="eyebrow mb-4">/ Intelligence engine</div>
+      <h2 class="grad-text text-4xl lg:text-5xl font-semibold tracking-tight">Intelligence built into every experience.</h2>
+      <p class="mt-4 text-muted text-lg">Real-time visibility across content, campaigns, and customers — without leaving the platform.</p>
+    </div>
+
+    <!-- Mock dashboard -->
+    <div class="mock-window reveal">
+      <div class="mock-bar">
+        <span class="dot" style="background:#FF5F57"></span>
+        <span class="dot" style="background:#FEBC2E"></span>
+        <span class="dot" style="background:#28C840"></span>
+        <span class="ml-4 text-[11px] font-mono text-muted">app.relayto.ai / dashboards / oncology-launch</span>
+      </div>
+      <div class="p-5 lg:p-7 space-y-4">
+
+        <!-- SVG gradient defs (shared) -->
+        <svg width="0" height="0" class="absolute" aria-hidden="true">
+          <defs>
+            <linearGradient id="gradPurple" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#9aa3ee" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#5E6AD2" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#34d399" stop-opacity="0.45"/>
+              <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="gradBar" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#9aa3ee"/>
+              <stop offset="100%" stop-color="#5E6AD2"/>
+            </linearGradient>
+            <linearGradient id="gradBar2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#f0a8d8"/>
+              <stop offset="100%" stop-color="#c66ab3"/>
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <!-- Dashboard tabs -->
+        <div class="dash-tabs">
+          <button class="dash-tab active" data-tab="hub" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+            Hub Analytics
+          </button>
+          <button class="dash-tab" data-tab="doc" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>
+            Document Analytics
+          </button>
+        </div>
+
+        <!-- ============ HUB PANE ============ -->
+        <div id="tab-hub" class="dash-pane space-y-4">
+
+        <!-- ===== Row 1 — 4 KPI cards ===== -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <!-- Visits -->
+          <div class="stat-card">
+            <div class="eyebrow">Visits</div>
+            <div class="flex items-end justify-between gap-2 mt-2">
+              <div>
+                <div class="kpi-num text-2xl lg:text-3xl font-semibold tracking-tight">286,543</div>
+                <div class="flex items-center gap-2 mt-1 text-[11px]">
+                  <span class="text-muted">-12</span>
+                  <span class="px-1.5 py-[1px] rounded bg-emerald-400/15 text-emerald-300/90 font-mono">▲ 13%</span>
+                </div>
+              </div>
+              <svg viewBox="0 0 80 36" class="w-20 h-9 shrink-0" preserveAspectRatio="none">
+                <path d="M0 28 L10 22 L20 26 L30 14 L40 18 L50 8 L60 16 L70 6 L80 12 L80 36 L0 36 Z" fill="url(#gradPurple)"/>
+                <path d="M0 28 L10 22 L20 26 L30 14 L40 18 L50 8 L60 16 L70 6 L80 12" fill="none" stroke="#9aa3ee" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <!-- Page Views -->
+          <div class="stat-card">
+            <div class="insight-wrap pop-pageviews">
+              <div class="insight-pop" data-insight>
+                <span class="insight-icon">
+                  <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+                See how users truly engage
+              </div>
+            </div>
+            <div class="eyebrow">Page Views</div>
+            <div class="flex items-end justify-between gap-2 mt-2">
+              <div>
+                <div class="kpi-num text-2xl lg:text-3xl font-semibold tracking-tight">1,900</div>
+                <div class="flex items-center gap-2 mt-1 text-[11px]">
+                  <span class="text-muted">+4</span>
+                  <span class="px-1.5 py-[1px] rounded bg-emerald-400/15 text-emerald-300/90 font-mono">▲ 43%</span>
+                </div>
+              </div>
+              <svg viewBox="0 0 80 36" class="w-20 h-9 shrink-0" preserveAspectRatio="none">
+                <path d="M0 30 L10 24 L20 28 L30 18 L40 22 L50 10 L60 14 L70 4 L80 10 L80 36 L0 36 Z" fill="url(#gradPurple)"/>
+                <path d="M0 30 L10 24 L20 28 L30 18 L40 22 L50 10 L60 14 L70 4 L80 10" fill="none" stroke="#9aa3ee" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <!-- Devices donut -->
+          <div class="stat-card">
+            <div class="insight-wrap pop-devices">
+              <div class="insight-pop" data-insight>
+                <span class="insight-icon">
+                  <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L2 7 l10 5 10-5z"/><path d="M2 17 l10 5 10-5"/><path d="M2 12 l10 5 10-5"/></svg>
+                </span>
+                Find your most valuable channels
+              </div>
+            </div>
+            <div class="eyebrow">Devices</div>
+            <div class="flex items-center gap-3 mt-1">
+              <svg viewBox="0 0 36 36" class="w-16 h-16 -rotate-90">
+                <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/>
+                <!-- desktop 83.4% — 73.3 of 87.96 -->
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#5E6AD2" stroke-width="5"
+                        stroke-dasharray="73.3 87.96" stroke-dashoffset="0" stroke-linecap="round"/>
+                <!-- mobile 12.5% -->
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#c66ab3" stroke-width="5"
+                        stroke-dasharray="11 87.96" stroke-dashoffset="-74" stroke-linecap="round"/>
+                <!-- tablet 0.8% sliver as amber -->
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#f0a8d8" stroke-width="5"
+                        stroke-dasharray="0.7 87.96" stroke-dashoffset="-86" stroke-linecap="round"/>
+              </svg>
+              <div class="text-[11px] space-y-1">
+                <div class="flex items-center gap-1.5 text-muted"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span>Desktop</div>
+                <div class="flex items-center gap-1.5 text-muted"><span class="w-1.5 h-1.5 rounded-full" style="background:#c66ab3"></span>Mobile</div>
+                <div class="flex items-center gap-1.5 text-muted"><span class="w-1.5 h-1.5 rounded-full" style="background:#f0a8d8"></span>Tablet</div>
+              </div>
+            </div>
+          </div>
+          <!-- Devices breakdown -->
+          <div class="stat-card">
+            <div class="eyebrow mb-3">Devices</div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <div class="text-[10px] text-muted">Desktop</div>
+                <div class="kpi-num text-lg lg:text-xl font-semibold tracking-tight mt-1 text-white">83.4%</div>
+                <div class="text-[10px] text-rose-300/80 font-mono mt-0.5">▼ 0.4%</div>
+              </div>
+              <div>
+                <div class="text-[10px] text-muted">Mobile</div>
+                <div class="kpi-num text-lg lg:text-xl font-semibold tracking-tight mt-1 text-white">12.5%</div>
+                <div class="text-[10px] text-rose-300/80 font-mono mt-0.5">▼ 0.7%</div>
+              </div>
+              <div>
+                <div class="text-[10px] text-muted">Tablet</div>
+                <div class="kpi-num text-lg lg:text-xl font-semibold tracking-tight mt-1 text-white">0.8%</div>
+                <div class="text-[10px] text-rose-300/80 font-mono mt-0.5">▼ 0.1%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Row 2 — Avg time / Pages / Access ===== -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Avg time spent -->
+          <div class="stat-card">
+            <div class="eyebrow">Avg. time spent</div>
+            <div class="flex items-end justify-between gap-3 mt-2">
+              <div>
+                <div class="kpi-num text-2xl lg:text-3xl font-semibold tracking-tight">01:30</div>
+                <div class="flex items-center gap-2 mt-1 text-[11px]">
+                  <span class="text-muted">+00:03</span>
+                  <span class="px-1.5 py-[1px] rounded bg-emerald-400/15 text-emerald-300/90 font-mono">▲ 23%</span>
+                </div>
+              </div>
+              <svg viewBox="0 0 100 36" class="w-28 h-9 shrink-0" preserveAspectRatio="none">
+                <path d="M0 26 L12 30 L24 22 L36 24 L48 14 L60 20 L72 10 L84 16 L100 6 L100 36 L0 36 Z" fill="url(#gradPurple)"/>
+                <path d="M0 26 L12 30 L24 22 L36 24 L48 14 L60 20 L72 10 L84 16 L100 6" fill="none" stroke="#9aa3ee" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <!-- Pages Viewed -->
+          <div class="stat-card">
+            <div class="eyebrow">Pages Viewed</div>
+            <div class="flex items-end justify-between gap-3 mt-2">
+              <div>
+                <div class="kpi-num text-2xl lg:text-3xl font-semibold tracking-tight">27%</div>
+                <div class="flex items-center gap-2 mt-1 text-[11px]">
+                  <span class="text-muted">+9%</span>
+                  <span class="px-1.5 py-[1px] rounded bg-emerald-400/15 text-emerald-300/90 font-mono">▲ 37%</span>
+                </div>
+              </div>
+              <svg viewBox="0 0 100 36" class="w-28 h-9 shrink-0" preserveAspectRatio="none">
+                <path d="M0 30 L12 26 L24 28 L36 18 L48 22 L60 12 L72 16 L84 8 L100 4 L100 36 L0 36 Z" fill="url(#gradGreen)"/>
+                <path d="M0 30 L12 26 L24 28 L36 18 L48 22 L60 12 L72 16 L84 8 L100 4" fill="none" stroke="#34d399" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <!-- Access by email -->
+          <div class="stat-card">
+            <div class="eyebrow">Access to data by email</div>
+            <div class="flex items-center gap-3 mt-3">
+              <div class="flex -space-x-2.5">
+                <div class="w-9 h-9 rounded-full border-2 border-[#0d0d12] bg-gradient-to-br from-indigo-400 to-indigo-700"></div>
+                <div class="w-9 h-9 rounded-full border-2 border-[#0d0d12] bg-gradient-to-br from-purple-400 to-fuchsia-700"></div>
+                <div class="w-9 h-9 rounded-full border-2 border-[#0d0d12] bg-gradient-to-br from-pink-400 to-rose-600"></div>
+                <div class="w-9 h-9 rounded-full border-2 border-[#0d0d12] bg-gradient-to-br from-sky-400 to-blue-700"></div>
+                <div class="w-9 h-9 rounded-full border-2 border-[#0d0d12] bg-gradient-to-br from-emerald-400 to-teal-700"></div>
+                <div class="w-9 h-9 rounded-full border-2 border-[#0d0d12] bg-white/[0.06] grid place-items-center text-[11px] font-mono text-muted">+5</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Row 3 — Overview chart + Most viewed pages ===== -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Overview chart -->
+          <div class="stat-card md:col-span-2 relative">
+            <div class="insight-wrap pop-overview">
+              <div class="insight-pop" data-insight>
+                <span class="insight-icon">
+                  <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l6-6 4 4 8-8"/><path d="M14 8h7v7"/></svg>
+                </span>
+                Optimize routes to conversion
+              </div>
+            </div>
+            <div class="flex items-center justify-between mb-5">
+              <div class="text-base font-semibold tracking-tight text-muted">Overview</div>
+              <div class="flex items-center gap-4 text-[11px] text-muted">
+                <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full" style="background:#c66ab3"></span>Visits</span>
+                <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span>Visitors</span>
+              </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="relative h-44 lg:h-52">
+              <!-- y-axis grid + labels -->
+              <div class="absolute inset-0 flex flex-col justify-between text-[10px] text-muted/70 font-mono">
+                <div class="flex items-center gap-2"><span class="w-6 text-right">50</span><span class="flex-1 h-px bg-white/[0.04]"></span></div>
+                <div class="flex items-center gap-2"><span class="w-6 text-right">40</span><span class="flex-1 h-px bg-white/[0.04]"></span></div>
+                <div class="flex items-center gap-2"><span class="w-6 text-right">30</span><span class="flex-1 h-px bg-white/[0.04]"></span></div>
+                <div class="flex items-center gap-2"><span class="w-6 text-right">20</span><span class="flex-1 h-px bg-white/[0.04]"></span></div>
+                <div class="flex items-center gap-2"><span class="w-6 text-right">10</span><span class="flex-1 h-px bg-white/[0.04]"></span></div>
+                <div class="flex items-center gap-2"><span class="w-6 text-right">0</span><span class="flex-1 h-px bg-white/[0.06]"></span></div>
+              </div>
+
+              <!-- bars -->
+              <div class="absolute inset-0 pl-9 flex items-end gap-2">
+                <!-- 12 months × 2 bars each. heights in % -->
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:62%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:54%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:48%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:42%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:70%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:58%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:85%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:70%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:55%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:48%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:64%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:52%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:74%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:62%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:46%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:38%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+                <!-- Sep — highlighted -->
+                <div class="flex-1 flex items-end gap-1 h-full relative">
+                  <div class="ov-bar shadow-[0_0_20px_rgba(198,106,179,0.45)]" style="height:90%; background:linear-gradient(180deg,#f4b8df,#c66ab3)"></div>
+                  <div class="ov-bar shadow-[0_0_20px_rgba(94,106,210,0.45)]" style="height:78%; background:linear-gradient(180deg,#a8b1f1,#5E6AD2)"></div>
+                  <!-- tooltip -->
+                  <div class="ov-tip tip-pulse absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full z-10 whitespace-nowrap
+                              rounded-lg border border-white/10 bg-[#11111a]/95 backdrop-blur px-3 py-2 text-[11px]
+                              shadow-[0_8px_24px_rgba(0,0,0,0.6)]">
+                    <div class="text-white font-medium mb-1">September 2026</div>
+                    <div class="flex items-center gap-2 text-muted">
+                      <span class="w-1.5 h-1.5 rounded-full" style="background:#c66ab3"></span>Visits
+                      <span class="text-white ml-auto pl-3">285 543</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-muted mt-0.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-accent"></span>Visitors
+                      <span class="text-white ml-auto pl-3">243 347</span>
+                    </div>
+                    <span class="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45 bg-[#11111a] border-r border-b border-white/10"></span>
+                  </div>
+                  <!-- dashed indicator line -->
+                  <div class="ov-indicator absolute top-0 left-1/2 -translate-x-1/2 bottom-0 w-px bg-[repeating-linear-gradient(180deg,rgba(255,255,255,0.18)_0_4px,transparent_4px_8px)]"></div>
+                </div>
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:60%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:50%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:78%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:66%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+                <div class="flex-1 flex items-end gap-1 h-full"><div class="ov-bar" style="height:82%; background:linear-gradient(180deg,#f0a8d8,#c66ab3)"></div><div class="ov-bar" style="height:72%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div></div>
+              </div>
+            </div>
+
+            <!-- x-axis labels -->
+            <div class="pl-9 mt-2 flex gap-2 text-[10px] font-mono text-muted/80">
+              <div class="flex-1 text-center">Jan</div>
+              <div class="flex-1 text-center">Feb</div>
+              <div class="flex-1 text-center">Mar</div>
+              <div class="flex-1 text-center">Apr</div>
+              <div class="flex-1 text-center">May</div>
+              <div class="flex-1 text-center">Jun</div>
+              <div class="flex-1 text-center">Jul</div>
+              <div class="flex-1 text-center">Aug</div>
+              <div class="flex-1 text-center text-white">Sep</div>
+              <div class="flex-1 text-center">Oct</div>
+              <div class="flex-1 text-center">Nov</div>
+              <div class="flex-1 text-center">Dec</div>
+            </div>
+          </div>
+
+          <!-- Most viewed pages -->
+          <div class="stat-card">
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-base font-semibold tracking-tight text-muted">Most viewed pages</div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] font-mono text-muted/80 mb-3">
+              <span>Pages</span><span>Views</span>
+            </div>
+            <ul class="space-y-3">
+              <li class="mv-row flex items-center gap-3">
+                <div class="w-9 h-9 rounded-md bg-gradient-to-br from-rose-400/30 to-fuchsia-700/30 border border-white/10 shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm truncate">10 inventions that ch…</div>
+                </div>
+                <div class="text-sm tabular-nums text-white">36 659</div>
+              </li>
+              <li class="mv-row flex items-center gap-3">
+                <div class="w-9 h-9 rounded-md bg-gradient-to-br from-indigo-400/30 to-blue-700/30 border border-white/10 shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm truncate">Human Illustrations</div>
+                </div>
+                <div class="text-sm tabular-nums text-white">28 738</div>
+              </li>
+              <li class="mv-row flex items-center gap-3">
+                <div class="w-9 h-9 rounded-md bg-gradient-to-br from-amber-300/30 to-orange-600/30 border border-white/10 shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm truncate">White paper</div>
+                </div>
+                <div class="text-sm tabular-nums text-white">26 291</div>
+              </li>
+              <li class="mv-row flex items-center gap-3">
+                <div class="w-9 h-9 rounded-md bg-gradient-to-br from-emerald-400/30 to-teal-700/30 border border-white/10 shrink-0"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm truncate">GPL Research</div>
+                </div>
+                <div class="text-sm tabular-nums text-white">19 294</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        </div><!-- /#tab-hub -->
+
+        <!-- ============ DOC PANE ============ -->
+        <div id="tab-doc" class="dash-pane inactive space-y-4">
+
+          <!-- Row 1 — KPIs -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- Total Reads -->
+            <div class="stat-card">
+              <div class="eyebrow">Total Reads</div>
+              <div class="flex items-end justify-between gap-2 mt-2">
+                <div>
+                  <div class="kpi-num text-2xl lg:text-3xl font-semibold tracking-tight">84,217</div>
+                  <div class="flex items-center gap-2 mt-1 text-[11px]">
+                    <span class="text-muted">+1.2k</span>
+                    <span class="px-1.5 py-[1px] rounded bg-emerald-400/15 text-emerald-300/90 font-mono">▲ 18%</span>
+                  </div>
+                </div>
+                <svg viewBox="0 0 80 36" class="w-20 h-9 shrink-0" preserveAspectRatio="none">
+                  <path d="M0 30 L10 26 L20 22 L30 24 L40 14 L50 18 L60 8 L70 12 L80 4 L80 36 L0 36 Z" fill="url(#gradPurple)"/>
+                  <path d="M0 30 L10 26 L20 22 L30 24 L40 14 L50 18 L60 8 L70 12 L80 4" fill="none" stroke="#9aa3ee" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <!-- Read Depth -->
+            <div class="stat-card">
+              <div class="eyebrow">Read Depth</div>
+              <div class="flex items-end justify-between gap-2 mt-2">
+                <div>
+                  <div class="kpi-num text-2xl lg:text-3xl font-semibold tracking-tight">67%</div>
+                  <div class="flex items-center gap-2 mt-1 text-[11px]">
+                    <span class="text-muted">+4%</span>
+                    <span class="px-1.5 py-[1px] rounded bg-emerald-400/15 text-emerald-300/90 font-mono">▲ 9%</span>
+                  </div>
+                </div>
+                <svg viewBox="0 0 80 36" class="w-20 h-9 shrink-0" preserveAspectRatio="none">
+                  <path d="M0 28 L10 24 L20 26 L30 20 L40 22 L50 14 L60 12 L70 8 L80 6 L80 36 L0 36 Z" fill="url(#gradGreen)"/>
+                  <path d="M0 28 L10 24 L20 26 L30 20 L40 22 L50 14 L60 12 L70 8 L80 6" fill="none" stroke="#34d399" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <!-- Reading Time -->
+            <div class="stat-card">
+              <div class="eyebrow">Reading Time</div>
+              <div class="flex items-end justify-between gap-2 mt-2">
+                <div>
+                  <div class="kpi-num text-2xl lg:text-3xl font-semibold tracking-tight">04:42</div>
+                  <div class="flex items-center gap-2 mt-1 text-[11px]">
+                    <span class="text-muted">+00:42</span>
+                    <span class="px-1.5 py-[1px] rounded bg-emerald-400/15 text-emerald-300/90 font-mono">▲ 22%</span>
+                  </div>
+                </div>
+                <svg viewBox="0 0 80 36" class="w-20 h-9 shrink-0" preserveAspectRatio="none">
+                  <path d="M0 26 L10 28 L20 22 L30 24 L40 16 L50 18 L60 10 L70 12 L80 6 L80 36 L0 36 Z" fill="url(#gradPurple)"/>
+                  <path d="M0 26 L10 28 L20 22 L30 24 L40 16 L50 18 L60 10 L70 12 L80 6" fill="none" stroke="#9aa3ee" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <!-- Completion donut -->
+            <div class="stat-card">
+              <div class="eyebrow">Completion</div>
+              <div class="flex items-center gap-3 mt-1">
+                <svg viewBox="0 0 36 36" class="w-16 h-16 -rotate-90">
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#5E6AD2" stroke-width="5"
+                          stroke-dasharray="36.6 87.96" stroke-dashoffset="0" stroke-linecap="round"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#c66ab3" stroke-width="5"
+                          stroke-dasharray="33.4 87.96" stroke-dashoffset="-37" stroke-linecap="round"/>
+                  <circle cx="18" cy="18" r="14" fill="none" stroke="#f0a8d8" stroke-width="5"
+                          stroke-dasharray="18 87.96" stroke-dashoffset="-71" stroke-linecap="round"/>
+                </svg>
+                <div class="text-[11px] space-y-1">
+                  <div class="flex items-center gap-1.5 text-muted"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span>Full read</div>
+                  <div class="flex items-center gap-1.5 text-muted"><span class="w-1.5 h-1.5 rounded-full" style="background:#c66ab3"></span>Partial</div>
+                  <div class="flex items-center gap-1.5 text-muted"><span class="w-1.5 h-1.5 rounded-full" style="background:#f0a8d8"></span>Bounce</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2 — Engagement per slide + Top viewers -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- Engagement per slide -->
+            <div class="stat-card md:col-span-2 relative">
+              <div class="insight-wrap pop-slides">
+                <div class="insight-pop" data-insight>
+                  <span class="insight-icon">
+                    <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+                  </span>
+                  From first view to final click
+                </div>
+              </div>
+              <div class="flex items-center justify-between mb-5">
+                <div class="text-base font-semibold tracking-tight text-muted">Engagement per slide</div>
+                <div class="flex items-center gap-4 text-[11px] text-muted">
+                  <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span>% read</span>
+                </div>
+              </div>
+              <div class="relative h-44 lg:h-52">
+                <div class="absolute inset-0 flex flex-col justify-between text-[10px] text-muted/70 font-mono">
+                  <div class="flex items-center gap-2"><span class="w-6 text-right">100</span><span class="flex-1 h-px bg-white/[0.04]"></span></div>
+                  <div class="flex items-center gap-2"><span class="w-6 text-right">75</span><span class="flex-1 h-px bg-white/[0.04]"></span></div>
+                  <div class="flex items-center gap-2"><span class="w-6 text-right">50</span><span class="flex-1 h-px bg-white/[0.04]"></span></div>
+                  <div class="flex items-center gap-2"><span class="w-6 text-right">25</span><span class="flex-1 h-px bg-white/[0.04]"></span></div>
+                  <div class="flex items-center gap-2"><span class="w-6 text-right">0</span><span class="flex-1 h-px bg-white/[0.06]"></span></div>
+                </div>
+                <div class="absolute inset-0 pl-9 flex items-end gap-1.5">
+                  <div class="ov-bar" style="height:92%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:88%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:82%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:78%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:74%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:68%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:62%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <!-- slide 8 highlighted -->
+                  <div class="relative flex-1 h-full flex items-end" style="min-width:3px">
+                    <div class="ov-bar w-full shadow-[0_0_20px_rgba(94,106,210,0.55)]" style="height:96%; background:linear-gradient(180deg,#b4bcf3,#5E6AD2)"></div>
+                    <div class="ov-tip tip-pulse absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full z-10 whitespace-nowrap
+                                rounded-lg border border-white/10 bg-[#11111a]/95 backdrop-blur px-3 py-2 text-[11px]
+                                shadow-[0_8px_24px_rgba(0,0,0,0.6)]">
+                      <div class="text-white font-medium mb-1">Slide 08 · Mechanism</div>
+                      <div class="flex items-center gap-2 text-muted">
+                        <span class="w-1.5 h-1.5 rounded-full bg-accent"></span>Read by
+                        <span class="text-white ml-auto pl-3">96.2%</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-muted mt-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-muted"></span>Avg time
+                        <span class="text-white ml-auto pl-3">00:42</span>
+                      </div>
+                      <span class="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45 bg-[#11111a] border-r border-b border-white/10"></span>
+                    </div>
+                    <div class="ov-indicator absolute top-0 left-1/2 -translate-x-1/2 bottom-0 w-px bg-[repeating-linear-gradient(180deg,rgba(255,255,255,0.18)_0_4px,transparent_4px_8px)]"></div>
+                  </div>
+                  <div class="ov-bar" style="height:54%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:48%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:52%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:46%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:42%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                  <div class="ov-bar" style="height:38%; background:linear-gradient(180deg,#9aa3ee,#5E6AD2)"></div>
+                </div>
+              </div>
+              <div class="pl-9 mt-2 flex gap-1.5 text-[10px] font-mono text-muted/80">
+                <div class="flex-1 text-center">01</div>
+                <div class="flex-1 text-center">02</div>
+                <div class="flex-1 text-center">03</div>
+                <div class="flex-1 text-center">04</div>
+                <div class="flex-1 text-center">05</div>
+                <div class="flex-1 text-center">06</div>
+                <div class="flex-1 text-center">07</div>
+                <div class="flex-1 text-center text-white">08</div>
+                <div class="flex-1 text-center">09</div>
+                <div class="flex-1 text-center">10</div>
+                <div class="flex-1 text-center">11</div>
+                <div class="flex-1 text-center">12</div>
+                <div class="flex-1 text-center">13</div>
+                <div class="flex-1 text-center">14</div>
+              </div>
+            </div>
+
+            <!-- Top viewers -->
+            <div class="stat-card">
+              <div class="insight-wrap pop-topviewers">
+                <div class="insight-pop" data-insight>
+                  <span class="insight-icon">
+                    <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                  </span>
+                  Uncover granular user behavior
+                </div>
+              </div>
+              <div class="text-base font-semibold tracking-tight text-muted mb-4">Top viewers</div>
+              <div class="flex items-center justify-between text-[10px] font-mono text-muted/80 mb-3">
+                <span>Account</span><span>Time</span>
+              </div>
+              <ul class="space-y-3">
+                <li class="mv-row flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-indigo-700 border-2 border-[#0d0d12] shrink-0 grid place-items-center text-[10px] font-semibold">JW</div>
+                  <div class="min-w-0 flex-1">
+                    <div class="text-sm truncate">Dr. J. Wexler</div>
+                    <div class="text-[10px] text-muted">Memorial · 12 visits</div>
+                  </div>
+                  <div class="text-sm tabular-nums text-white">04:32</div>
+                </li>
+                <li class="mv-row flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-rose-600 border-2 border-[#0d0d12] shrink-0 grid place-items-center text-[10px] font-semibold">MH</div>
+                  <div class="min-w-0 flex-1">
+                    <div class="text-sm truncate">Dr. M. Hayashi</div>
+                    <div class="text-[10px] text-muted">Kyoto Med · 8 visits</div>
+                  </div>
+                  <div class="text-sm tabular-nums text-white">03:51</div>
+                </li>
+                <li class="mv-row flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-teal-700 border-2 border-[#0d0d12] shrink-0 grid place-items-center text-[10px] font-semibold">AC</div>
+                  <div class="min-w-0 flex-1">
+                    <div class="text-sm truncate">Acme Capital</div>
+                    <div class="text-[10px] text-muted">6 viewers</div>
+                  </div>
+                  <div class="text-sm tabular-nums text-white">03:22</div>
+                </li>
+                <li class="mv-row flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-blue-700 border-2 border-[#0d0d12] shrink-0 grid place-items-center text-[10px] font-semibold">RB</div>
+                  <div class="min-w-0 flex-1">
+                    <div class="text-sm truncate">Dr. R. Bhatt</div>
+                    <div class="text-[10px] text-muted">Cleveland · 5 visits</div>
+                  </div>
+                  <div class="text-sm tabular-nums text-white">02:58</div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Row 3 — Sources + Devices + Shares -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- Top sources -->
+            <div class="stat-card">
+              <div class="eyebrow mb-4">Top sources</div>
+              <div class="space-y-3">
+                <div>
+                  <div class="flex items-center justify-between text-[12px] mb-1.5">
+                    <span class="text-white">Email</span><span class="text-muted font-mono">42%</span>
+                  </div>
+                  <div class="h-1.5 rounded-full bg-white/[0.05] overflow-hidden">
+                    <div class="h-full rounded-full" style="width:42%; background:linear-gradient(90deg,#5E6AD2,#9aa3ee)"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between text-[12px] mb-1.5">
+                    <span class="text-white">Salesforce</span><span class="text-muted font-mono">28%</span>
+                  </div>
+                  <div class="h-1.5 rounded-full bg-white/[0.05] overflow-hidden">
+                    <div class="h-full rounded-full" style="width:28%; background:linear-gradient(90deg,#c66ab3,#f0a8d8)"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between text-[12px] mb-1.5">
+                    <span class="text-white">Direct</span><span class="text-muted font-mono">18%</span>
+                  </div>
+                  <div class="h-1.5 rounded-full bg-white/[0.05] overflow-hidden">
+                    <div class="h-full rounded-full" style="width:18%; background:linear-gradient(90deg,#34d399,#10b981)"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between text-[12px] mb-1.5">
+                    <span class="text-white">LinkedIn</span><span class="text-muted font-mono">12%</span>
+                  </div>
+                  <div class="h-1.5 rounded-full bg-white/[0.05] overflow-hidden">
+                    <div class="h-full rounded-full" style="width:12%; background:linear-gradient(90deg,#9aa3ee,#5E6AD2)"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Devices small -->
+            <div class="stat-card">
+              <div class="eyebrow mb-3">Devices</div>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <div class="text-[10px] text-muted">Desktop</div>
+                  <div class="kpi-num text-lg lg:text-xl font-semibold tracking-tight mt-1 text-white">71%</div>
+                  <div class="text-[10px] text-emerald-300/80 font-mono mt-0.5">▲ 2.1%</div>
+                </div>
+                <div>
+                  <div class="text-[10px] text-muted">Mobile</div>
+                  <div class="kpi-num text-lg lg:text-xl font-semibold tracking-tight mt-1 text-white">24%</div>
+                  <div class="text-[10px] text-rose-300/80 font-mono mt-0.5">▼ 1.4%</div>
+                </div>
+                <div>
+                  <div class="text-[10px] text-muted">Tablet</div>
+                  <div class="kpi-num text-lg lg:text-xl font-semibold tracking-tight mt-1 text-white">5%</div>
+                  <div class="text-[10px] text-muted font-mono mt-0.5">— 0%</div>
+                </div>
+              </div>
+              <!-- stacked bar -->
+              <div class="mt-5 h-2 rounded-full overflow-hidden flex bg-white/[0.04]">
+                <div class="h-full" style="width:71%; background:linear-gradient(90deg,#5E6AD2,#9aa3ee)"></div>
+                <div class="h-full" style="width:24%; background:linear-gradient(90deg,#c66ab3,#f0a8d8); margin-left:1px"></div>
+                <div class="h-full" style="width:5%; background:linear-gradient(90deg,#34d399,#10b981); margin-left:1px"></div>
+              </div>
+              <!-- mini sparkline trend -->
+              <div class="mt-4 pt-3 border-t border-white/[0.05]">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] font-mono text-muted tracking-widest">14-DAY TREND</span>
+                  <span class="text-[10px] text-accent font-mono">desktop ↑</span>
+                </div>
+                <svg viewBox="0 0 200 28" class="w-full h-7" preserveAspectRatio="none">
+                  <path d="M0 22 L15 20 L30 22 L45 18 L60 19 L75 14 L90 16 L105 12 L120 13 L135 9 L150 11 L165 7 L180 8 L200 4 L200 28 L0 28 Z" fill="url(#gradPurple)"/>
+                  <path d="M0 22 L15 20 L30 22 L45 18 L60 19 L75 14 L90 16 L105 12 L120 13 L135 9 L150 11 L165 7 L180 8 L200 4" fill="none" stroke="#9aa3ee" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Shares -->
+            <div class="stat-card">
+              <div class="eyebrow">Shares</div>
+              <div class="flex items-end justify-between gap-2 mt-2">
+                <div>
+                  <div class="kpi-num text-2xl lg:text-3xl font-semibold tracking-tight">312</div>
+                  <div class="flex items-center gap-2 mt-1 text-[11px]">
+                    <span class="text-muted">+48</span>
+                    <span class="px-1.5 py-[1px] rounded bg-emerald-400/15 text-emerald-300/90 font-mono">▲ 18%</span>
+                  </div>
+                </div>
+                <svg viewBox="0 0 90 36" class="w-24 h-9 shrink-0" preserveAspectRatio="none">
+                  <path d="M0 32 L10 28 L20 30 L30 24 L40 26 L50 18 L60 20 L70 12 L80 10 L90 4 L90 36 L0 36 Z" fill="url(#gradPurple)"/>
+                  <path d="M0 32 L10 28 L20 30 L30 24 L40 26 L50 18 L60 20 L70 12 L80 10 L90 4" fill="none" stroke="#9aa3ee" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="mt-4 pt-3 border-t border-white/[0.05] flex items-center gap-2">
+                <div class="flex -space-x-2">
+                  <div class="w-7 h-7 rounded-full border-2 border-[#0d0d12] bg-gradient-to-br from-indigo-400 to-indigo-700"></div>
+                  <div class="w-7 h-7 rounded-full border-2 border-[#0d0d12] bg-gradient-to-br from-pink-400 to-rose-600"></div>
+                  <div class="w-7 h-7 rounded-full border-2 border-[#0d0d12] bg-gradient-to-br from-sky-400 to-blue-700"></div>
+                  <div class="w-7 h-7 rounded-full border-2 border-[#0d0d12] bg-white/[0.06] grid place-items-center text-[10px] font-mono text-muted">+8</div>
+                </div>
+                <span class="text-[10px] text-muted ml-1.5">recent sharers</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /#tab-doc -->
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ SECTION 11 — LABS ============ -->
+<section id="labs" class="relative py-28 lg:py-36 overflow-hidden">
+  <!-- premium darker backdrop -->
+  <div class="absolute inset-0 -z-0 pointer-events-none">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,#0a0a18_0%,#040406_55%,#020203_100%)]"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] rounded-full blur-[140px] bg-accent/15"></div>
+  </div>
+
+  <div class="relative max-w-5xl mx-auto px-6 lg:px-10 text-center">
+    <div class="reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/40 bg-accent/10 text-[12px] font-mono tracking-widest text-accent backdrop-blur">
+      <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
+      NEW · LIMITED ACCESS
+    </div>
+    <h2 class="reveal mt-8 grad-text text-5xl lg:text-7xl font-semibold tracking-[-0.03em] leading-[0.95]">
+      Introducing <span class="grad-accent">RELAYTO.AI Labs</span>.
+    </h2>
+    <p class="reveal mt-6 text-muted text-lg lg:text-xl max-w-2xl mx-auto">
+      Next-gen AI tools, purpose-built for life sciences workflows — where speed, accuracy and compliance can't be traded off.
+    </p>
+
+    <div class="reveal mt-12 flex flex-wrap justify-center gap-2.5">
+      <span class="chip"><span class="chip-dot"></span>Microsite Builder</span>
+      <span class="chip"><span class="chip-dot"></span>Global-to-Local</span>
+      <span class="chip"><span class="chip-dot"></span>Smart Content Hubs</span>
+      <span class="chip"><span class="chip-dot"></span>Translation Engine</span>
+      <span class="chip"><span class="chip-dot"></span>AI Experience Engine</span>
+      <span class="chip"><span class="chip-dot"></span>Pharma-Specific AI Support</span>
+    </div>
+
+    <div class="reveal mt-12">
+      <a href="#book" class="btn-primary">Join the Waitlist
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ SECTION 12 — BOOK A CALL ============ -->
+<section id="book" class="py-24 lg:py-32">
+  <div class="max-w-6xl mx-auto px-6 lg:px-10">
+    <div class="grid lg:grid-cols-12 gap-10 items-start">
+      <div class="lg:col-span-5 reveal lg:sticky lg:top-28">
+        <div class="eyebrow mb-4">/ Talk to us</div>
+        <h2 class="grad-text text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.05]">Ready to see it in action?</h2>
+        <p class="mt-5 text-muted text-lg leading-relaxed">Book a 30-minute call. We'll show you a live RELAYTO.AI environment tailored to your therapeutic area — and answer your hardest compliance questions.</p>
+        <ul class="mt-8 space-y-3 text-sm">
+          <li class="flex items-center gap-3 text-muted"><span class="text-accent">✓</span> Live walkthrough of your use case</li>
+          <li class="flex items-center gap-3 text-muted"><span class="text-accent">✓</span> Security &amp; compliance Q&amp;A</li>
+          <li class="flex items-center gap-3 text-muted"><span class="text-accent">✓</span> Pricing &amp; rollout plan</li>
+        </ul>
+      </div>
+
+      <!-- HubSpot calendar embed placeholder -->
+      <div class="lg:col-span-7 reveal">
+        <div class="surface p-2 sm:p-3" data-card>
+          <div class="surface-top-line"></div>
+          <div class="flex items-center justify-between px-3 pt-3 pb-2">
+            <div>
+              <div class="text-sm font-semibold">Meet with Gaurav Sanganee</div>
+              <div class="text-xs text-muted mt-0.5">30 min · video call · powered by HubSpot</div>
+            </div>
+            <a href="https://meetings.hubspot.com/gaurav-sanganee?uuid=21f85290-cd13-4f79-871f-f7eb46e923c5" target="_blank" rel="noopener"
+               class="text-[11px] font-mono text-muted hover:text-white transition inline-flex items-center gap-1">
+              Open in tab
+              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            </a>
+          </div>
+          <div class="rounded-xl overflow-hidden border border-white/[0.06] bg-[#0a0a0c]" style="height: 760px;">
+            <iframe seamless allowfullscreen
+              src="https://meetings.hubspot.com/gaurav-sanganee?uuid=21f85290-cd13-4f79-871f-f7eb46e923c5"
+              title="Meet with Gaurav Sanganee"
+              loading="lazy"
+              style="border: none; width: 100%; height: 100%"></iframe>
+          </div>
+          <p class="text-[11px] text-muted text-center mt-3 mb-1 font-mono tracking-wider">POWERED BY HUBSPOT MEETINGS</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="relative z-10 border-t border-white/[0.06] bg-deep/80 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 py-16">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-5">
+        <a href="#" class="inline-flex items-center">
+          <img src="https://cdn.relayto.com/images_originals/RELAYTO%20AIlogowhite_6998769577846d56171bddd3.png"
+               alt="RELAYTO.AI"
+               class="h-7 w-auto select-none" draggable="false" />
+        </a>
+        <p class="mt-5 grad-text text-2xl lg:text-3xl font-semibold tracking-tight max-w-md leading-tight">
+          RELAYTO.AI for Healthcare &amp; Life Sciences.
+          <span class="text-muted font-normal">Simple. Secure. Scalable.</span>
+        </p>
+        <div class="mt-8 flex items-center gap-3">
+          <a href="#" aria-label="LinkedIn" class="w-9 h-9 rounded-lg border border-white/10 grid place-items-center text-muted hover:text-white hover:border-white/20 transition">
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM10 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.4c0-1.29-.02-2.95-1.8-2.95-1.8 0-2.07 1.4-2.07 2.85V21h-4z"/></svg>
+          </a>
+          <a href="#" aria-label="X" class="w-9 h-9 rounded-lg border border-white/10 grid place-items-center text-muted hover:text-white hover:border-white/20 transition">
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor"><path d="M17.5 3h3l-7 8 8.2 10H15l-5-6.3L4.5 21H1.5l7.5-8.6L1 3h6.7L12 8.7z"/></svg>
+          </a>
+          <a href="#" aria-label="YouTube" class="w-9 h-9 rounded-lg border border-white/10 grid place-items-center text-muted hover:text-white hover:border-white/20 transition">
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor"><path d="M23 12s0-3.6-.45-5.3c-.25-.95-1-1.7-1.95-1.95C18.9 4.3 12 4.3 12 4.3s-6.9 0-8.6.45c-.95.25-1.7 1-1.95 1.95C1 8.4 1 12 1 12s0 3.6.45 5.3c.25.95 1 1.7 1.95 1.95 1.7.45 8.6.45 8.6.45s6.9 0 8.6-.45c.95-.25 1.7-1 1.95-1.95C23 15.6 23 12 23 12zM10 15.5v-7l6 3.5z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="md:col-span-2">
+        <div class="eyebrow mb-4">Product</div>
+        <ul class="space-y-3 text-sm">
+          <li><a href="#analytics" class="text-muted hover:text-white">Analytics</a></li>
+          <li><a href="#integrations" class="text-muted hover:text-white">Integrations</a></li>
+          <li><a href="#labs" class="text-muted hover:text-white">Labs</a></li>
+          <li><a href="#" class="text-muted hover:text-white">Security</a></li>
+        </ul>
+      </div>
+      <div class="md:col-span-2">
+        <div class="eyebrow mb-4">Solutions</div>
+        <ul class="space-y-3 text-sm">
+          <li><a href="#areas" class="text-muted hover:text-white">Pharma</a></li>
+          <li><a href="#areas" class="text-muted hover:text-white">Biotech</a></li>
+          <li><a href="#areas" class="text-muted hover:text-white">Consultancies</a></li>
+        </ul>
+      </div>
+      <div class="md:col-span-3">
+        <div class="eyebrow mb-4">Company</div>
+        <ul class="space-y-3 text-sm">
+          <li><a href="#cases" class="text-muted hover:text-white">Customers</a></li>
+          <li><a href="#book" class="text-muted hover:text-white">Contact</a></li>
+          <li><a href="#" class="text-muted hover:text-white">Privacy Policy</a></li>
+          <li><a href="#" class="text-muted hover:text-white">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-14 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-muted">
+      <p>© 2026 RELAYTO.AI · All rights reserved.</p>
+      <p class="font-mono tracking-widest">SOC 2 · HIPAA · GDPR · ISO 27001</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ===== Mobile menu =====
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const iconMenu = document.getElementById('iconMenu');
+  const iconClose = document.getElementById('iconClose');
+  menuBtn?.addEventListener('click', () => {
+    const open = mobileMenu.classList.toggle('hidden') === false;
+    iconMenu.classList.toggle('hidden', open);
+    iconClose.classList.toggle('hidden', !open);
+  });
+  mobileMenu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    mobileMenu.classList.add('hidden'); iconMenu.classList.remove('hidden'); iconClose.classList.add('hidden');
+  }));
+
+  // ===== Reveal on scroll =====
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
       }
-    </style>
-  </head>
-  <body>
-    <iframe
-      src="https://closingdelta.relayto.com/e/closing-delta-pharmaceutical-advisory-digital-excellence-copy-b2guq5rzqr9tw"
-      frameborder="0"
-      allowfullscreen
-    ></iframe>
-  </body>
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach((el, i) => {
+    el.style.transitionDelay = (Math.min(i, 6) * 25) + 'ms';
+    io.observe(el);
+  });
+
+  // ===== Mouse-tracking spotlights =====
+  document.querySelectorAll('[data-card]').forEach(card => {
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+      card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+    });
+  });
+
+  // ===== Hero parallax =====
+  const hero = document.querySelector('.hero-parallax');
+  if (hero && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      const max = window.innerHeight;
+      const p = Math.min(y / max, 1);
+      hero.style.opacity = (1 - p * 0.9).toString();
+      hero.style.transform = `translateY(${p * 80}px) scale(${1 - p * 0.05})`;
+    }, { passive: true });
+  }
+
+  // ===== Use-case carousels =====
+  document.querySelectorAll('[data-carousel]').forEach(carousel => {
+    const viewport = carousel.querySelector('.carousel-viewport');
+    const track    = carousel.querySelector('.carousel-track');
+    const cards    = Array.from(track.querySelectorAll('.carousel-card'));
+    const prevBtn  = carousel.querySelector('.carousel-btn.prev');
+    const nextBtn  = carousel.querySelector('.carousel-btn.next');
+    const dots     = carousel.querySelector('.carousel-dots');
+    const autoMs   = parseInt(carousel.dataset.autorotate || '0', 10);
+    if (!cards.length) return;
+
+    let current  = 0;
+    let maxIndex = 0;
+
+    function computeMaxIndex() {
+      const cw  = cards[0].offsetWidth;
+      const gap = 16;
+      const vw  = viewport.clientWidth;
+      const visible = Math.max(1, Math.round((vw + gap) / (cw + gap)));
+      return Math.max(0, cards.length - visible);
+    }
+
+    function buildDots() {
+      dots.innerHTML = '';
+      if (maxIndex === 0) { dots.style.display = 'none'; return; }
+      dots.style.display = '';
+      const n = maxIndex + 1;
+      for (let i = 0; i < n; i++) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'carousel-dot' + (i === current ? ' active' : '');
+        b.dataset.index = String(i);
+        b.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        b.addEventListener('click', () => go(i));
+        dots.appendChild(b);
+      }
+    }
+
+    function updateUI() {
+      const hideNav = maxIndex === 0;
+      if (prevBtn) { prevBtn.style.display = hideNav ? 'none' : ''; prevBtn.disabled = current <= 0; }
+      if (nextBtn) { nextBtn.style.display = hideNav ? 'none' : ''; nextBtn.disabled = current >= maxIndex; }
+      Array.from(dots.children).forEach((d, i) => d.classList.toggle('active', i === current));
+    }
+
+    function scrollToIndex(i) {
+      const card = cards[i];
+      if (!card) return;
+      const left = card.offsetLeft - track.offsetLeft - 4;
+      viewport.scrollTo({ left, behavior: 'smooth' });
+    }
+
+    function go(i, fromAuto) {
+      if (fromAuto) {
+        current = i > maxIndex ? 0 : i;
+      } else {
+        current = Math.max(0, Math.min(maxIndex, i));
+      }
+      scrollToIndex(current);
+      updateUI();
+    }
+
+    function setup() {
+      maxIndex = computeMaxIndex();
+      if (current > maxIndex) current = maxIndex;
+      buildDots();
+      updateUI();
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => go(current - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => go(current + 1));
+
+    // Sync active dot on manual scroll (only consider valid page indices)
+    let scrollTm;
+    viewport.addEventListener('scroll', () => {
+      clearTimeout(scrollTm);
+      scrollTm = setTimeout(() => {
+        const scrollL = viewport.scrollLeft;
+        let bestI = 0, bestD = Infinity;
+        for (let i = 0; i <= maxIndex; i++) {
+          const d = Math.abs((cards[i].offsetLeft - track.offsetLeft) - scrollL);
+          if (d < bestD) { bestD = d; bestI = i; }
+        }
+        if (bestI !== current) {
+          current = bestI;
+          updateUI();
+        }
+      }, 90);
+    });
+
+    // Rebuild on resize (cards-per-view changes)
+    let resizeTm;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTm);
+      resizeTm = setTimeout(setup, 150);
+    });
+
+    setup();
+
+    // Auto-rotate (pause on hover/touch)
+    let auto;
+    function start() {
+      if (!autoMs || maxIndex === 0) return;
+      stop();
+      auto = setInterval(() => go(current + 1, true), autoMs);
+    }
+    function stop() { if (auto) { clearInterval(auto); auto = null; } }
+    carousel.addEventListener('mouseenter', stop);
+    carousel.addEventListener('mouseleave', start);
+    carousel.addEventListener('focusin', stop);
+    carousel.addEventListener('touchstart', stop, { passive: true });
+    if (autoMs) {
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { start(); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.3 });
+      io.observe(carousel);
+    }
+  });
+
+  // ===== Video play overlay =====
+  (function setupVideo(){
+    const overlay = document.getElementById('videoPlayOverlay');
+    const video   = document.getElementById('explainerVideo');
+    if (!overlay || !video) return;
+    const hideOverlay = () => {
+      overlay.style.opacity = '0';
+      overlay.style.pointerEvents = 'none';
+      setTimeout(() => overlay.remove(), 500);
+    };
+    overlay.addEventListener('click', () => {
+      video.play().catch(() => {});
+      hideOverlay();
+    });
+    video.addEventListener('play', hideOverlay);
+  })();
+
+  // ===== Analytics dashboard animation =====
+  (function animateDashboard(){
+    const dash = document.querySelector('#analytics .mock-window');
+    if (!dash) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    function animateNum(el, target, duration) {
+      el.style.opacity = '1';
+      el.style.transition = 'opacity .4s ease-out';
+      const tm = target.match(/^(\d+):(\d+)$/);
+      if (tm) {
+        const total = parseInt(tm[1])*60 + parseInt(tm[2]);
+        const t0 = performance.now();
+        const step = (now) => {
+          const t = Math.min((now - t0) / duration, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          const s = Math.round(total * eased);
+          el.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+        return;
+      }
+      const nm = target.match(/^([\d.,]+)(.*)$/);
+      if (!nm) return;
+      const raw = nm[1];
+      const suffix = nm[2] || '';
+      const hasDot = raw.includes('.');
+      const decimals = hasDot ? raw.split('.')[1].length : 0;
+      const num = parseFloat(raw.replace(/,/g, ''));
+      const t0 = performance.now();
+      const step = (now) => {
+        const t = Math.min((now - t0) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const cur = num * eased;
+        let txt;
+        if (decimals > 0) txt = cur.toFixed(decimals);
+        else txt = Math.round(cur).toLocaleString('en-US');
+        el.textContent = txt + suffix;
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    function setupAndPlay(pane) {
+      if (!pane || pane.dataset.animated === '1') return;
+      pane.dataset.animated = '1';
+      pane.classList.add('pre-anim');
+
+      const bars = pane.querySelectorAll('.ov-bar');
+      bars.forEach(b => {
+        b.dataset.h = b.style.height || '50%';
+        b.style.height = '0%';
+      });
+
+      const strokes = Array.from(pane.querySelectorAll('svg path[fill="none"]'));
+      strokes.forEach(p => {
+        p.classList.add('spark-line');
+        let len = 260;
+        try { if (p.getTotalLength) { const t = p.getTotalLength(); if (t > 0) len = t; } } catch(_){}
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+        p.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.16,1,.3,1), opacity .5s ease-out';
+      });
+
+      const fills = Array.from(pane.querySelectorAll('svg path[fill^="url"]'));
+      fills.forEach(p => {
+        p.classList.add('spark-fill');
+        p.style.transition = 'opacity 1s ease-out 0.5s';
+      });
+
+      const arcs = Array.from(pane.querySelectorAll('svg circle[stroke-dasharray]'));
+      arcs.forEach((c, i) => {
+        c.classList.add('donut-arc');
+        c.dataset.dash = c.getAttribute('stroke-dasharray');
+        c.setAttribute('stroke-dasharray', '0 100');
+        c.style.transitionDelay = (i * 0.18) + 's';
+      });
+
+      const kpis = Array.from(pane.querySelectorAll('.kpi-num'));
+      kpis.forEach(n => {
+        if (!n.dataset.final) n.dataset.final = n.textContent.trim();
+        n.style.opacity = '0';
+        n.textContent = '0';
+      });
+
+      const mvRows = Array.from(pane.querySelectorAll('.mv-row'));
+
+      requestAnimationFrame(() => {
+        kpis.forEach((n, i) => setTimeout(() => animateNum(n, n.dataset.final, 1100), i * 80));
+        strokes.forEach((p, i) => setTimeout(() => { p.style.strokeDashoffset = '0'; }, 200 + i * 90));
+        fills.forEach(p => { p.style.opacity = '1'; });
+        setTimeout(() => { arcs.forEach(c => c.setAttribute('stroke-dasharray', c.dataset.dash)); }, 250);
+        bars.forEach((b, i) => setTimeout(() => { b.style.height = b.dataset.h; }, 350 + i * 28));
+        mvRows.forEach((r, i) => setTimeout(() => { r.style.opacity = '1'; r.style.transform = 'translateX(0)'; }, 900 + i * 100));
+        setTimeout(() => { pane.classList.remove('pre-anim'); }, 60);
+        const insights = pane.querySelectorAll('[data-insight]');
+        insights.forEach((el, i) => setTimeout(() => el.classList.add('in'), 2500 + i * 350));
+      });
+    }
+
+    // Animate the active pane when dashboard enters viewport
+    const hubPane = dash.querySelector('#tab-hub');
+    if (hubPane) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          setupAndPlay(hubPane);
+          io.unobserve(e.target);
+        });
+      }, { threshold: 0.25 });
+      io.observe(dash);
+    }
+
+    // Tab switching
+    const tabBtns = dash.querySelectorAll('.dash-tab');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        const pane = dash.querySelector('#tab-' + target);
+        // Collapse BEFORE the pane is shown so the user never sees a flash of the final state
+        if (pane && pane.dataset.animated !== '1') setupAndPlay(pane);
+        tabBtns.forEach(b => b.classList.toggle('active', b === btn));
+        dash.querySelectorAll('.dash-pane').forEach(p => {
+          p.classList.toggle('inactive', p.id !== 'tab-' + target);
+        });
+      });
+    });
+  })();
+
+  // ===== Calendar generation =====
+  (function buildCal(){
+    const cal = document.getElementById('cal'); if (!cal) return;
+    // May 2026 — May 1 is Friday (verify)
+    const first = new Date(2026, 4, 1);          // month 4 = May
+    const startDay = first.getDay();              // 0=Sun..6=Sat
+    const daysInMonth = new Date(2026, 5, 0).getDate(); // 31
+    const today = 14;       // highlight "today" per context
+    const selected = 21;    // demo selection
+    for (let i = 0; i < startDay; i++) {
+      const e = document.createElement('div');
+      cal.appendChild(e);
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      const c = document.createElement('button');
+      const past = d < today;
+      const isToday = d === today;
+      const isSel = d === selected;
+      c.textContent = d;
+      c.className = 'h-9 rounded-md text-sm transition border ' + (
+        isSel
+          ? 'bg-accent/20 border-accent/50 text-white'
+          : isToday
+            ? 'bg-white/[0.06] border-white/15 text-white'
+            : past
+              ? 'border-transparent text-muted/40 cursor-not-allowed'
+              : 'border-transparent text-fg hover:bg-white/[0.06] hover:border-white/10'
+      );
+      cal.appendChild(c);
+    }
+  })();
+</script>
+
+</body>
 </html>
